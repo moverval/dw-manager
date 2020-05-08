@@ -1,0 +1,22 @@
+{
+    "extends": [
+        "tslint:recommended",
+        "tslint-eslint-rules"
+    ],
+    "defaultSeverity": "warning",
+    "jsRules": {},
+    "rules": {
+        "curly": true,
+        "interface-name": [true, "never-prefix"],
+        "max-line-length": [true, 150],
+        "object-literal-sort-keys": false,
+        "member-access": [true, "no-public"],
+        "eofline": true,
+        "whitespace": [false, "check-module"],
+        "no-angle-bracket-type-assertion": true,
+        "ordered-imports": false,
+        "quotemark": [true, "double", "avoid-escape"],
+        "object-curly-spacing": [true, "always"]
+    },
+    "rulesDirectory": []
+}

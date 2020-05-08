@@ -1,0 +1,32 @@
+{
+  "name": "dw-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node dist/index.js",
+    "dev": "nodemon src/index.ts",
+    "build": "tsc",
+    "check": "tslint -c tslint.json \"src/**/*.ts\""
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^13.13.5",
+    "nodemon": "^2.0.3",
+    "ts-node": "^8.10.1",
+    "tslint": "^6.1.2",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "@serialport/parser-readline": "^8.0.6",
+    "@types/uuid": "^7.0.3",
+    "@types/ws": "^7.2.4",
+    "discord.js": "^12.2.0",
+    "dotenv": "^8.2.0",
+    "serialport": "^8.0.8",
+    "tslint-eslint-rules": "^5.4.0",
+    "uuid": "^8.0.0"
+  }
+}

@@ -11,10 +11,12 @@ dotenv.config();
 
 const userConfig: UserConfig = new UserConfigInitializer(3000, UserConfigInitializer.defaultLevelState);
 
-const cs: CoinSystem = new CoinSystem();
+const cs: CoinSystem = new CoinSystem("coinsystem.json");
 const cu: CoinUser = new CoinUser(userConfig);
+cs.addUser(cu);
 
 const key = Serealizer.writeObject("test.json", cu);
+Serealizer.writeObject("test2.json", cs);
 
 // const key = Serealizer.makeKey("test.json", "*");
 const value = Serealizer.loadObject<UserSave>(key);

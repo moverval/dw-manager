@@ -1,11 +1,11 @@
-export interface Serializeable<T> {
+export interface Serializable<T> {
     serialize: () => SerializeValue;
     deserialize: (s: T) => boolean;
 }
 
 export interface KeySerializeable<T> {
     key: string;
-    serealizeable: Serializeable<T>
+    serealizeable: Serializable<T>
 }
 
 export interface SerializeValue {
@@ -21,4 +21,4 @@ export interface SerializedValue<T> {
     [key: string]: T
 }
 
-export interface StandardSerializeable extends Serializeable<SerializeValue> {}
+export interface StandardSerializeable extends Serializable<SerializeValue> {}

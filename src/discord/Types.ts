@@ -2,7 +2,7 @@ import { Message, Client } from "discord.js";
 
 export type Command = ($: VarLink, message: Message, args: string[], invoke?: string) => boolean;
 
-export type CommandMap = {
+export interface CommandMap {
     [invoke: string]: Command
 };
 

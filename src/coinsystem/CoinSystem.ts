@@ -28,3 +28,8 @@ export default class Coinsystem {
         this.registerChange();
     }
 }
+
+export interface CoinState {
+    amount: number;
+    locked: number;
+}

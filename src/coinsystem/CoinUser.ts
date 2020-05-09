@@ -1,24 +1,29 @@
 import { v4 as uuidv4 } from "uuid";
+import { CoinState } from "./CoinSystem";
+import { UserConfigInitializer, UserConfig } from "./CoinConfig";
+import { UserSave } from "./components/UserSave";
+import { Serializeable } from "../filesystem/Types";
 
-export default class CoinUser {
+export default class CoinUser implements Serializeable<UserSave> {
     private id: string;
-    private coins: {
-        count: number,
-        freezed: number
-    };
+    private coins = {} as CoinState;
 
-    constructor(id: string, coins?: number, freezed?: number) {
-        if(id) {
-            this.id = id;
-        } else {
+    constructor(uc?: UserConfig) {
+        if(uc) {
             this.id = uuidv4();
+            this.coins.amount = uc.initAmount;
+            this.coins.locked = 0;
         }
-        if(coins) {
-            this.coins.count = coins;
-        }
-        if(freezed) {
-            this.coins.freezed = freezed;
-        }
+    }
+
+    serialize(): UserSave {
+        return { id: this.id, coins: this.coins };
+    }
+
+    deserialize(s: UserSave): boolean {
+        this.coins = s.coins;
+        this.id = s.id;
+        return true;
     }
 
     getId() {

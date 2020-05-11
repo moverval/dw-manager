@@ -29,6 +29,10 @@ export default class CoinUser implements Serializable<UserSave> {
         return true;
     }
 
+    setCoins(coins: number) {
+        this.coins.amount = coins;
+    }
+
     getId() {
         return this.id;
     }

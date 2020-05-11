@@ -1,5 +1,5 @@
 import { Message } from "discord.js";
-import { Command, VarLink } from "../Types";
+import { VarLink } from "../Types";
 
 export default function(env: VarLink, message: Message, args: string[]): boolean {
     message.channel.send({

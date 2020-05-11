@@ -1,18 +1,20 @@
 import { Client, Message } from "discord.js";
 import { Command, CommandMap } from "./Types";
-
+import EventHandler from "./components/EventHandler";
 
 export default class Bot {
     client: Client;
     commands: CommandMap = {};
     prefix: string;
     token: string;
+    eventHandler: EventHandler;
 
     constructor(token: string, prefix: string) {
         this.client = new Client();
         this.token = token;
         this.prefix = prefix;
         this.registerEvents();
+        this.eventHandler = new EventHandler(this.client);
     }
 
     private registerEvents() {

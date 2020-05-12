@@ -18,7 +18,7 @@ export default class CoinUser implements Serializable<UserSave> {
         }
     }
 
-    serialize(): UserSave {
+    serialize() {
         return { id: this.id, coins: this.coins, levelState: this.levelState };
     }
 

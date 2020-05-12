@@ -3,9 +3,9 @@ export interface Serializable<T> {
     deserialize: (s: T) => boolean;
 }
 
-export interface KeySerializeable<T> {
+export interface KeySerializable<T> {
     key: string;
-    serealizeable: Serializable<T>
+    serializable: Serializable<T>
 }
 
 export interface SerializeValue {

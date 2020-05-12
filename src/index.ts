@@ -6,15 +6,24 @@ import { UserConfig, CoinAmountState, LevelState, UserConfigInitializer } from "
 import Serializer from "./filesystem/Serializer";
 import CoinUser from "./coinsystem/CoinUser";
 import { UserSave } from "./coinsystem/components/UserSave";
+import SerializeObject from "./filesystem/SerializeObject";
 
 dotenv.config();
 
-const bot = new Bot(process.env.BOT_TOKEN, process.env.BOT_PREFIX);
+const bot = new Bot({
+    token: process.env.BOT_TOKEN,
+    prefix: process.env.BOT_PREFIX
+});
 
 (async () => {
     await bot.login();
-    bot.registerCommand("ping", PingCommand);
+    bot.commandHandler.registerCommand("ping", PingCommand);
     bot.eventHandler.addEventListener("message", (message) => {
-        message.channel.send("Test");
+        if(message.member.user.id !== bot.client.user.id) {
+            message.channel.send("Test");
+        }
     });
+
+    const so = new SerializeObject({ test: true });
+    Serializer.writeObject("test.json", so);
 })();

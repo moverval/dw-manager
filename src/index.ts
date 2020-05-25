@@ -7,6 +7,7 @@ import Serializer from "./filesystem/Serializer";
 import CoinUser from "./coinsystem/CoinUser";
 import { UserSave } from "./coinsystem/components/UserSave";
 import SerializeObject from "./filesystem/SerializeObject";
+import ReadyEvent from "./discord/events/ReadyEvent";
 
 dotenv.config();
 
@@ -15,15 +16,16 @@ const bot = new Bot({
     prefix: process.env.BOT_PREFIX
 });
 
-// (async () => {
-//     await bot.login();
-//     bot.commandHandler.registerCommand("ping", PingCommand);
-//     bot.eventHandler.addEventListener("message", (message) => {
-//         if(message.member.user.id !== bot.client.user.id) {
-//             message.channel.send("Test");
-//         }
-//     });
-// })();
+(async () => {
+    await bot.login();
+    bot.commandHandler.registerCommand("ping", PingCommand);
+    bot.eventHandler.addEventListener("ready", ReadyEvent);
+    bot.eventHandler.addEventListener("message", (message) => {
+        if(message.member.user.id !== bot.client.user.id) {
+            message.channel.send("Test");
+        }
+    });
+})();
 
 const so = new SerializeObject({ test: true });
 Serializer.writeObject("test.json", so);

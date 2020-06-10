@@ -27,6 +27,7 @@ const bot = new Bot({
     bot.eventHandler.addEventListener("ready", ReadyEvent);
     bot.eventHandler.addEventListener('guildMemberAdd', (member) => GuildMemberAddEvent(member));
     bot.eventHandler.addEventListener('guildMemberRemove', (member) => GuildMemberRemove(member));
+    setInterval(() => { membersJoin = 0; }, 15000)
 })();
 
 const so = new SerializeObject({ test: true });

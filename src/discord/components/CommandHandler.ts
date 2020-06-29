@@ -1,10 +1,13 @@
 import EventHandler from "./EventHandler";
-import { Command, CommandMap } from "../Types";
+import { CommandMap } from "../Types";
 import { Message } from "discord.js";
+import Command from "../abstract/Command";
+import { DocumentationLinker } from "../loaders/JsonLinker";
 
 export default class CommandHandler {
     eventHandler: EventHandler;
     commands: CommandMap = {};
+    private prefix: string;
 
     constructor(eventHandler: EventHandler, prefix: string) {
         this.eventHandler = eventHandler;
@@ -24,6 +27,10 @@ export default class CommandHandler {
         }
     }
 
+    getPrefix() {
+        return this.prefix;
+    }
+
     private static makeMessageListener(prefix: string, commands: CommandMap) {
         return (message: Message) => {
             if(message.content.startsWith(prefix) &&
@@ -31,9 +38,17 @@ export default class CommandHandler {
                 const args = message.content.split(" ");
                 const invoke = args.shift().slice(prefix.length);
                 if(commands[invoke]) {
-                    commands[invoke]({ client: message.client }, message, args, invoke);
+                    commands[invoke].run({ client: message.client }, message, args);
                 }
             }
         };
+    }
+
+    assignDocumentations(linker: DocumentationLinker) {
+        for(const cmdDocumentationName in linker.value) {
+            if(linker.value[cmdDocumentationName] && this.isCommand(cmdDocumentationName)) {
+                this.commands[cmdDocumentationName].documentation = linker.value[cmdDocumentationName];
+            }
+        }
     }
 }

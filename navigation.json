@@ -1,0 +1,4 @@
+{
+    "configDirectory": "./src/config",
+    "dataDirectory": "./data"
+}

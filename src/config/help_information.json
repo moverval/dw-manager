@@ -1,0 +1,21 @@
+{
+    "help": {
+        "title": "Help",
+        "nav": null,
+        "description": "#file: ./markdown/help/helpCommand.md",
+        "childreen": [
+            {
+                "title": "Good, you got it",
+                "nav": "specification",
+                "description": "You can now move on to real documentations.",
+                "childreen": []
+            }
+        ]
+    },
+    "ping": {
+        "title": "Ping",
+        "nav": null,
+        "description": "#file: ./markdown/help/pingCommand.md",
+        "childreen": []
+    }
+}

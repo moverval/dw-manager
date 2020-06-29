@@ -1,5 +1,5 @@
 import { Client, Message } from "discord.js";
-import { Command, CommandMap } from "./Types";
+import { CommandMap } from "./Types";
 import EventHandler from "./components/EventHandler";
 import CommandHandler from "./components/CommandHandler";
 

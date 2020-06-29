@@ -1,16 +1,13 @@
 import dotenv from "dotenv";
-import CoinSystem from "./coinsystem/CoinSystem";
 import Bot from "./discord/Bot";
 import PingCommand from "./discord/commands/PingCommand";
-import { UserConfig, CoinAmountState, LevelState, UserConfigInitializer } from "./coinsystem/CoinConfig";
-import Serializer from "./filesystem/Serializer";
-import CoinUser from "./coinsystem/CoinUser";
-import { UserSave } from "./coinsystem/components/UserSave";
-import SerializeObject from "./filesystem/SerializeObject";
 import ReadyEvent from "./discord/events/ReadyEvent";
-import GuildMemberAddEvent from './discord/events/GuildMemberAddEvent';
-import { GuildMember } from "discord.js";
-import GuildMemberRemove from "./discord/events/GuildMemberRemoveEvent";
+import HelpCommand from "./discord/commands/HelpCommand";
+import DataPoint from "./filesystem/DataPoint";
+import JsonLinker from "./discord/loaders/JsonLinker";
+import { StringMap } from "./Types";
+import DocumentationObject from "./discord/abstract/DocumentationObject";
+import DocumentationObjectParser from "./discord/components/DocumentationObjectParser";
 
 dotenv.config();
 
@@ -20,15 +17,18 @@ const bot = new Bot({
 });
 
 (async () => {
+    const rawNavData = new JsonLinker<{ configDirectory: string, dataDirectory: string }>
+                                        (new DataPoint("./"), "navigation.json");
+    rawNavData.load();
+    const dpConfig = new DataPoint(rawNavData.value.configDirectory);
+    const dpData = new DataPoint(rawNavData.value.dataDirectory);
+    const documentations = new JsonLinker<StringMap<DocumentationObject>>(dpConfig, "help_information.json");
+    documentations.addLoadingComponent(new DocumentationObjectParser(dpConfig, documentations));
+    documentations.load();
+
     await bot.login();
-    await bot.client.user.setActivity('düdelidü', { type: "WATCHING" } );
-    bot.commandHandler.registerCommand("ping", PingCommand);
-
+    bot.commandHandler.registerCommand("ping", new PingCommand(bot));
+    bot.commandHandler.registerCommand("help", new HelpCommand(bot));
+    bot.commandHandler.assignDocumentations(documentations);
     bot.eventHandler.addEventListener("ready", ReadyEvent);
-    bot.eventHandler.addEventListener('guildMemberAdd', (member) => GuildMemberAddEvent(member));
-    bot.eventHandler.addEventListener('guildMemberRemove', (member) => GuildMemberRemove(member));
-    setInterval(() => { membersJoin = 0; }, 15000)
 })();
-
-const so = new SerializeObject({ test: true });
-Serializer.writeObject("test.json", so);

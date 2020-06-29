@@ -1,5 +1,6 @@
 import typescript from "rollup-plugin-typescript2";
 import { terser } from "rollup-plugin-terser";
+import builtins from "rollup-plugin-node-builtins";
 
 const externalLibs = [
     "discord.js",
@@ -26,7 +27,8 @@ export default [
                 },
                 keep_classnames: false,
                 keep_fnames: false
-            })
+            }),
+            builtins()
         ]
     },
     {
@@ -39,7 +41,8 @@ export default [
             }
         ],
         plugins: [
-            typescript()
+            typescript(),
+            builtins()
         ]
     }
 ]

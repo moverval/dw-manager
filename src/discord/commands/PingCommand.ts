@@ -1,12 +1,15 @@
 import { Message } from "discord.js";
-import { VarLink } from "../Types";
+import { BotAction } from "../Types";
+import Command, { ReturnValue } from "../abstract/Command";
 
-export default function(env: VarLink, message: Message, args: string[]): boolean {
-    message.channel.send({
-        embed: {
-            description: env.client.ws.ping,
-            title: "Ping"
-        }
-    });
-    return true;
+export default class PingCommand extends Command {
+    run(action: BotAction, message: Message, args: string[]): ReturnValue {
+        message.channel.send({
+            embed: {
+                description: this.bot.client.ws.ping,
+                title: "Ping"
+            }
+        });
+        return ReturnValue.SUCCESS;
+    }
 }

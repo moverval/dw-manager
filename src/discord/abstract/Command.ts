@@ -17,10 +17,12 @@ export default abstract class Command {
         this.bot = bot;
     }
 
-    abstract run(action: BotAction, message: Message, args: string[]): ReturnValue;
+    abstract run(message: Message, args: string[]): ReturnValue;
 }
 
 export enum ReturnValue {
-    SUCCESS, FAILED_EXECUTING, WRONG_BOOTUP,
-    UNKNOWN_PARAMETER
+    SUCCESS,
+    FAILED_EXECUTING,
+    WRONG_BOOTUP,
+    UNKNOWN_PARAMETER,
 }

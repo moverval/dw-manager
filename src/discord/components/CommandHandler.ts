@@ -10,8 +10,12 @@ export default class CommandHandler {
     private prefix: string;
 
     constructor(eventHandler: EventHandler, prefix: string) {
+        this.prefix = prefix;
         this.eventHandler = eventHandler;
-        this.eventHandler.addEventListener("message", CommandHandler.makeMessageListener(prefix, this.commands));
+        this.eventHandler.addEventListener(
+            "message",
+            CommandHandler.makeMessageListener(prefix, this.commands)
+        );
     }
 
     isCommand(invoke: string) {
@@ -19,7 +23,7 @@ export default class CommandHandler {
     }
 
     registerCommand(invoke: string, command: Command): boolean {
-        if(!this.isCommand(invoke)) {
+        if (!this.isCommand(invoke)) {
             this.commands[invoke] = command;
             return true;
         } else {
@@ -33,21 +37,27 @@ export default class CommandHandler {
 
     private static makeMessageListener(prefix: string, commands: CommandMap) {
         return (message: Message) => {
-            if(message.content.startsWith(prefix) &&
-                !message.member.user.bot) {
+            if (
+                message.content.startsWith(prefix) &&
+                !message.member.user.bot
+            ) {
                 const args = message.content.split(" ");
                 const invoke = args.shift().slice(prefix.length);
-                if(commands[invoke]) {
-                    commands[invoke].run({ client: message.client }, message, args);
+                if (commands[invoke]) {
+                    commands[invoke].run(message, args);
                 }
             }
         };
     }
 
     assignDocumentations(linker: DocumentationLinker) {
-        for(const cmdDocumentationName in linker.value) {
-            if(linker.value[cmdDocumentationName] && this.isCommand(cmdDocumentationName)) {
-                this.commands[cmdDocumentationName].documentation = linker.value[cmdDocumentationName];
+        for (const cmdDocumentationName in linker.value) {
+            if (
+                linker.value[cmdDocumentationName] &&
+                this.isCommand(cmdDocumentationName)
+            ) {
+                this.commands[cmdDocumentationName].documentation =
+                    linker.value[cmdDocumentationName];
             }
         }
     }

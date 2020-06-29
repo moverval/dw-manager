@@ -9,6 +9,12 @@
                 "nav": "specification",
                 "description": "You can now move on to real documentations.",
                 "childreen": []
+            },
+            {
+                "title": "Titel für Usage",
+                "nav": "usage",
+                "description": "Beschreibung für Usage",
+                "childreen": []
             }
         ]
     },

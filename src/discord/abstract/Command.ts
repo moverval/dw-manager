@@ -12,9 +12,11 @@ import Bot from "../Bot";
 export default abstract class Command {
     bot: Bot;
     documentation: DocumentationObject;
+    readonly invoke: string;
 
-    constructor(bot: Bot) {
+    constructor(bot: Bot, invoke: string) {
         this.bot = bot;
+        this.invoke = invoke;
     }
 
     abstract run(message: Message, args: string[]): ReturnValue;

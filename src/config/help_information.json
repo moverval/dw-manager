@@ -5,15 +5,28 @@
         "description": "#file: ./markdown/help/helpCommand.md",
         "childreen": [
             {
-                "title": "Good, you got it",
-                "nav": "specification",
-                "description": "You can now move on to real documentations.",
+                "title": "Nutzung",
+                "nav": "usage",
+                "description": "```\n$prefix;help [Navigator/'commands'] ['tree']```",
                 "childreen": []
             },
             {
-                "title": "Titel für Usage",
-                "nav": "usage",
-                "description": "Beschreibung für Usage",
+                "title": "Navigation",
+                "nav": "navigation",
+                "description": "Navigationsbeschreibung",
+                "childreen": [
+                    {
+                        "title": "Punkte",
+                        "nav": "dots",
+                        "description": "Warum Punkte?",
+                        "childreen": []
+                    }
+                ]
+            },
+            {
+                "title": "Baumdarstellung",
+                "nav": "tree",
+                "description": "Baumdarstellung?",
                 "childreen": []
             }
         ]

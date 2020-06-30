@@ -1,17 +1,23 @@
-**Help Command**
-
-This Command is a tool to inspect Information about other Commands.
+Dieser Command wird genutzt um interessante Informationen oder den Syntax über einen anderen Befehl herauszufinden.
 
 **Syntax**
+```
+$prefix;help <Navigator>
+```
 
-This tool follows a strict syntax:
+**Navigator**
+Ein Navigator kann ein einfacher Name, aber auch ein Pfad zu einer bestimmten Erklärung sein.
+Um nach Unterthemen eines Befehls zu suchen wird ein **.** (Punkt) verwendet.
 
-$prefix;help <selector>
+Um beispielsweise zu dem Hilfstext des Commands *help* zu kommen wäre diese Schreibweise möglich:
+```
+$prefix;help help
+```
 
-The Command can not have more than two arguments, else it will display an error.
+Um nun nach der Nutzung dieses Commands nachzuschlagen kann man den Unterpunkt usage verwenden.
+Die korrekte Schreibweise sieht hierzu so aus:
+```
+$prefix;help help.usage
+```
 
-**Selector Basics**
-
-The selector works with two absoulute elements: **entries and seperators**.
-To select an entry, *simply write the name of it*.
-To enter it, use the seperator '**.**'.
+Unterpunkte werden immer nach dem Ende der Beschreibung des Befehls oder des oberen Unterpunkts angezeigt. Es kann also immer durch hinzufügen eines Punktes und des weiteren Unterpunktes in das neue Thema hineinnavigiert werden.

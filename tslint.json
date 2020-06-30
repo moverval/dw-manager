@@ -1,14 +1,12 @@
 {
-    "extends": [
-        "tslint:recommended",
-        "tslint-eslint-rules"
-    ],
+    "extends": ["prettier", "tslint:recommended", "tslint-eslint-rules"],
     "defaultSeverity": "warning",
+    "plugins": ["prettier"],
     "jsRules": {},
     "rules": {
         "curly": true,
         "interface-name": [true, "never-prefix"],
-        "max-line-length": [true, 150],
+        "max-line-length": [true, 210],
         "object-literal-sort-keys": false,
         "member-access": [true, "no-public"],
         "eofline": true,

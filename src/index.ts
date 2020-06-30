@@ -24,18 +24,13 @@ const bot = new Bot({
     rawNavData.load();
     const dpConfig = new DataPoint(rawNavData.value.configDirectory);
     const dpData = new DataPoint(rawNavData.value.dataDirectory);
-    const documentations = new JsonLinker<StringMap<DocumentationObject>>(
-        dpConfig,
-        "help_information.json"
-    );
-    documentations.addLoadingComponent(
-        new DocumentationObjectParser(dpConfig, documentations)
-    );
+    const documentations = new JsonLinker<StringMap<DocumentationObject>>(dpConfig, "help_information.json");
+    documentations.addLoadingComponent(new DocumentationObjectParser(dpConfig, documentations));
     documentations.load();
 
     await bot.login();
-    bot.commandHandler.registerCommand("ping", new PingCommand(bot));
-    bot.commandHandler.registerCommand("help", new HelpCommand(bot));
+    bot.commandHandler.registerCommand(new PingCommand(bot, "ping"));
+    bot.commandHandler.registerCommand(new HelpCommand(bot, "help"));
     bot.commandHandler.assignDocumentations(documentations);
     bot.eventHandler.addEventListener("ready", ReadyEvent);
 })();

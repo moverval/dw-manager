@@ -9,10 +9,13 @@
  * {
  *  title: "Title",
  *  description: "Description for Title",
+ *  nav: "title",
  *  childreen: [
  *      {
  *          title: "Title2",
- *          description: "Description for Title2"
+ *  	    nav: "nav2",
+ *          description: "Description for Title2",
+ *          childreen: []
  *      }: DocumentationObject
  *  ]
  * }: DocumentationObject
@@ -33,6 +36,7 @@ export default interface DocumentationObject {
  *
  * @example
  * {
+ *  title: "Title",
  *  description: "Description for Object",
  *  childreen: [
  *      {..}: DocumentationObject
@@ -40,6 +44,7 @@ export default interface DocumentationObject {
  * }
  */
 export interface ParentObject {
+    title: string;
     description: string;
     childreen?: DocumentationObject[];
 }

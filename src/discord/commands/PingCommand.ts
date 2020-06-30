@@ -1,5 +1,4 @@
 import { Message } from "discord.js";
-import { BotAction } from "../Types";
 import Command, { ReturnValue } from "../abstract/Command";
 
 export default class PingCommand extends Command {

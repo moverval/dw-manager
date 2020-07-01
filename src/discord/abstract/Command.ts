@@ -12,11 +12,17 @@ import Bot from "../Bot";
 export default abstract class Command {
     bot: Bot;
     documentation: DocumentationObject;
+    readonly visible: boolean;
     readonly invoke: string;
 
-    constructor(bot: Bot, invoke: string) {
+    constructor(bot: Bot, invoke: string, visible?: boolean) {
         this.bot = bot;
         this.invoke = invoke;
+        if (visible) {
+            this.visible = visible;
+        } else {
+            this.visible = true;
+        }
     }
 
     abstract run(message: Message, args: string[]): ReturnValue;

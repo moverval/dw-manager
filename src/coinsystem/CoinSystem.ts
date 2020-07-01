@@ -1,65 +1,74 @@
-import CoinUser from "./CoinUser";
-import { Serializable } from "../filesystem/Types"
-import { SystemSave } from "./components/SystemSave";
-import Serializer from "../filesystem/Serializer";
 import { StringMap } from "../Types";
+import Wrapper from "../Wrapper";
+import AccountEarnConfig from "./AccountEarnConfig";
+import Account from "./Account";
+import { Serializable } from "../filesystem/Types";
 
-export default class Coinsystem implements Serializable<SystemSave> {
-    private users: StringMap<CoinUser> = {};
-    private lastChange: Date = new Date();
-    private savePath: string;
-    private changeNumber: NodeJS.Timeout;
-    private changeWaitTime: number = 2e4;
+export default class CoinSystem implements Serializable<CoinSystemSerialized> {
+    private _accounts: StringMap<Account>;
+    private _earnConfig: Wrapper<AccountEarnConfig>;
 
-    constructor(path: string) {
-        this.savePath = path;
+    get earnConfig(): AccountEarnConfig {
+        return this._earnConfig.value;
     }
 
-    private registerChange() {
-        this.lastChange = new Date();
-        if(this.changeNumber) {
-            clearTimeout(this.changeNumber);
+    set earnConfig(earnConfig: AccountEarnConfig) {
+        this._earnConfig.value = earnConfig;
+    }
+
+    get accounts(): StringMap<Account> {
+        return this._accounts;
+    }
+
+    /**
+     * Creates Account if it doesn't exists.
+     * Prefer isAccount and accounts if another account shouldn't be created
+     */
+    getAccount(id: string) {
+        if (!this.isAccount(id)) {
+            this.addAccount(new Account(this, id));
         }
-        this.changeNumber = setTimeout(() => {
-            this.save();
-        }, this.changeWaitTime);
+
+        return this.accounts[id];
     }
 
-    save() {
-        Serializer.writeObject(this.savePath, this);
+    isAccount(accountId: string) {
+        return this._accounts[accountId] !== undefined;
     }
 
-    addUser(cu: CoinUser) {
-        this.users[cu.getId()] = cu;
-        this.registerChange();
+    constructor(earnConfig?: AccountEarnConfig) {
+        this._accounts = {};
+
+        if (earnConfig) {
+            this._earnConfig = new Wrapper(earnConfig);
+        } else {
+            this._earnConfig = new Wrapper(null);
+        }
     }
 
-    removeUser(cu: CoinUser) {
-        this.removeUserById(cu.getId());
-        this.registerChange();
+    addAccount(account: Account) {
+        this._accounts[account.userId] = account;
     }
 
-    removeUserById(cuid: string) {
-        this.users[cuid] = undefined;
-        this.registerChange();
+    removeAccount(accountId: string) {
+        this._accounts[accountId] = undefined;
     }
 
-    serialize(): SystemSave {
-        return { users: this.users, lastChange: this.lastChange }
+    serialize() {
+        return {
+            accounts: this._accounts,
+            earnConfigEat: this._earnConfig.value.eat,
+        };
     }
 
-    deserialize(s: SystemSave): boolean {
-        this.users = s.users;
-        this.lastChange = s.lastChange;
+    deserialize(s: CoinSystemSerialized) {
+        this._accounts = s.accounts;
+        this._earnConfig.value.eat = s.earnConfigEat;
         return true;
-    }
-
-    findUser(id: string) {
-        return this.users[id];
     }
 }
 
-export interface CoinState {
-    amount: number;
-    locked: number;
+interface CoinSystemSerialized {
+    accounts: StringMap<Account>;
+    earnConfigEat: number[];
 }

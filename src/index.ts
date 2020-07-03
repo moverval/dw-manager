@@ -9,13 +9,11 @@ import { StringMap } from "./Types";
 import DocumentationObject from "./discord/abstract/DocumentationObject";
 import DocumentationObjectParser from "./discord/components/DocumentationObjectParser";
 import CoinSystem from "./coinsystem/CoinSystem";
-import fs from "fs";
-import { exit } from "process";
 import AccountEarnConfig from "./coinsystem/AccountEarnConfig";
-import Account from "./coinsystem/Account";
 import CoinCommand from "./discord/commands/CoinCommand";
 import WordManager from "./discord/events/WordManager";
 import CheckCommand from "./discord/commands/admin/CheckCommand";
+import InviteTracker from "./discord/events/InviteTracker";
 
 dotenv.config();
 
@@ -60,4 +58,5 @@ const bot = new Bot({
 
     bot.eventHandler.addEventListener("ready", ReadyEvent);
     bot.eventHandler.addEventListener("message", WordManager(coinSystem));
+    bot.eventHandler.addEventListener("guildMemberAdd", InviteTracker(bot.client, coinSystem));
 })();

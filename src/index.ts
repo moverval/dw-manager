@@ -68,4 +68,6 @@ const bot = new Bot({
     const transfer = coinSystem.addTransferRequest(account, account2, 1000);
     coinSystem.makeTransfer(transfer);
     // bot.eventHandler.addEventListener("guildMemberAdd", InviteTracker(bot.client, coinSystem, ));
+
+    InviteTracker(coinSystem, bot);
 })();

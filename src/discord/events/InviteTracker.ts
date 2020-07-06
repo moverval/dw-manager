@@ -1,35 +1,27 @@
-import { GuildMember, Invite, Client, PartialGuildMember, Collection, TextChannel, MessageEmbed, User } from "discord.js";
+import { GuildMember, Invite, PartialGuildMember, Collection, TextChannel, MessageEmbed } from "discord.js";
 
 import CoinSystem from "../../coinsystem/CoinSystem";
-import { StringMap } from "../../Types";
-import JsonLinker from "../loaders/JsonLinker";
-import EventHandler from "../components/EventHandler";
-import ReactionManager from "../components/ReactionManager";
 import { AccountEarnType } from "../../coinsystem/AccountEarnConfig";
+import Bot from "../Bot";
 
 export default async function InviteTracker(
-    client: Client,
     coinSystem: CoinSystem,
-    inviteData: JsonLinker<StringMap<string>>,
-    eventHandler: EventHandler,
-    reactionManager: ReactionManager
+    bot: Bot
 ) {
-    InviteTracker.prototype.inviteCount = {};
-
     const guildInvites: Map<string, Collection<string, Invite>> = new Map();
 
-    client.guilds.cache.forEach((guild) => {
+    bot.client.guilds.cache.forEach((guild) => {
         guild
             .fetchInvites()
             .then((invites) => guildInvites.set(guild.id, invites))
             .catch(console.error);
     });
 
-    eventHandler.addEventListener("inviteCreate", async (invite) => {
+    bot.eventHandler.addEventListener("inviteCreate", async (invite) => {
         guildInvites.set(invite.guild.id, await invite.guild.fetchInvites());
     });
 
-    eventHandler.addEventListener("guildMemberAdd", async (member: GuildMember | PartialGuildMember) => {
+    bot.eventHandler.addEventListener("guildMemberAdd", async (member: GuildMember | PartialGuildMember) => {
         const cachedInvites = guildInvites.get(member.guild.id);
         const newInvites = await member.guild.fetchInvites();
         guildInvites.set(member.guild.id, newInvites);
@@ -39,12 +31,10 @@ export default async function InviteTracker(
 
             if (inviteUsed) {
                 const account = coinSystem.getAccount(inviteUsed.inviter.id);
-                const mainGuild = client.guilds.cache.find((guild) => guild.id === process.env.MAIN_GUILD);
+                const mainGuild = bot.client.guilds.cache.find((guild) => guild.id === process.env.MAIN_GUILD);
                 if (mainGuild) {
-                    const channel = mainGuild.channels.cache.find(
-                        (tmpChannel) => tmpChannel.id === process.env.CONFIRMATION_CHANNEL
-                    );
-                    if (channel.type === "text") {
+                    const channel = mainGuild.channels.cache.get(process.env.CONFIRMATION_CHANNEL);
+                    if (channel && channel.type === "text") {
                         const embed = new MessageEmbed();
                         embed
                             .setTitle("Bestätigung erforderlich")
@@ -56,19 +46,23 @@ export default async function InviteTracker(
                                 )}C`
                             );
                         const message = await (channel as TextChannel).send(embed);
-                        const reactionMessage = reactionManager.createMessage(message, "✅", "✅");
+                        const reactionMessage = bot.reactionManager.createMessage(message, "✅", "❎");
                         reactionMessage.setReactionListener(0, (user) => {
                             if(mainGuild.members.cache.get(user.id).permissions.has("ADMINISTRATOR")) {
-                                account.add(AccountEarnType.USER_JOINED, 1);
+                                account.add(AccountEarnType.INVITED_PERSON, 1);
                                 reactionMessage.remove();
                                 message.delete();
                             }
                         });
 
-                        reactionMessage.setReactionListener(1, () => {
-                            reactionMessage.remove();
-                            message.delete();
+                        reactionMessage.setReactionListener(1, (user) => {
+                            if(mainGuild.members.cache.get(user.id).permissions.has("ADMINISTRATOR")) {
+                                reactionMessage.remove();
+                                message.delete();
+                            }
                         });
+                    } else {
+                        console.log("Confirmation channel missing. Make sure that a channel id is given in the .env file");
                     }
                 }
             }

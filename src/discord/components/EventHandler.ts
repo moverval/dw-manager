@@ -4,7 +4,7 @@ import { ClientEvents, Client } from "discord.js";
 type EventListener = (...args: any) => void;
 
 export default class EventHandler {
-    events: StringMap<{ id: number, listener: EventListener }[]> = {};
+    events: StringMap<Array<{ id: number; listener: EventListener }>> = {};
     client: Client;
     count = 1;
 
@@ -12,12 +12,8 @@ export default class EventHandler {
         this.client = client;
     }
 
-    private distributor(eventName: keyof ClientEvents, ...args: any) {
-        this.call(eventName, ...args);
-    }
-
     addEventListener<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => void) {
-        if(!this.events[event]) {
+        if (!this.events[event]) {
             this.events[event] = [];
             this.client.on(event, this.distributor.bind(this, event));
         }
@@ -27,9 +23,9 @@ export default class EventHandler {
     }
 
     removeEventListener<K extends keyof ClientEvents>(event: K, id: number): boolean {
-        if(this.events[event]) {
+        if (this.events[event]) {
             const index = this.events[event].findIndex((obj) => obj.id === id);
-            if(index !== -1) {
+            if (index !== -1) {
                 this.events[event].slice(index, 1);
                 return true;
             }
@@ -38,8 +34,12 @@ export default class EventHandler {
     }
 
     private call<K extends keyof ClientEvents>(key: K, ...args: ClientEvents[K]) {
-        this.events[key].forEach(obj => {
+        this.events[key].forEach((obj) => {
             obj.listener(...args);
         });
+    }
+
+    private distributor(eventName: keyof ClientEvents, ...args: any) {
+        this.call(eventName, ...args);
     }
 }

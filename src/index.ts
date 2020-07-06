@@ -9,11 +9,12 @@ import { StringMap } from "./Types";
 import DocumentationObject from "./discord/abstract/DocumentationObject";
 import DocumentationObjectParser from "./discord/components/DocumentationObjectParser";
 import CoinSystem from "./coinsystem/CoinSystem";
-import AccountEarnConfig from "./coinsystem/AccountEarnConfig";
+import AccountEarnConfig, { AccountEarnType } from "./coinsystem/AccountEarnConfig";
 import CoinCommand from "./discord/commands/CoinCommand";
 import WordManager from "./discord/events/WordManager";
 import CheckCommand from "./discord/commands/admin/CheckCommand";
 import InviteTracker from "./discord/events/InviteTracker";
+import TestReaction from "./discord/commands/TestReaction";
 
 dotenv.config();
 
@@ -53,10 +54,18 @@ const bot = new Bot({
     bot.commandHandler.registerCommand(new HelpCommand(bot, "help"));
     bot.commandHandler.registerCommand(new CoinCommand(bot, "coins", coinSystem));
     bot.commandHandler.registerCommand(new CheckCommand(bot, "check", coinSystem));
+    bot.commandHandler.registerCommand(new TestReaction(bot, "reaction"));
 
     bot.commandHandler.assignDocumentations(documentations);
 
     bot.eventHandler.addEventListener("ready", ReadyEvent);
     bot.eventHandler.addEventListener("message", WordManager(coinSystem));
-    bot.eventHandler.addEventListener("guildMemberAdd", InviteTracker(bot.client, coinSystem));
+
+    const account = coinSystem.getAccount("test");
+    const account2 = coinSystem.getAccount("test2");
+    account.add(AccountEarnType.USER_JOINED, 1);
+
+    const transfer = coinSystem.addTransferRequest(account, account2, 1000);
+    coinSystem.makeTransfer(transfer);
+    // bot.eventHandler.addEventListener("guildMemberAdd", InviteTracker(bot.client, coinSystem, ));
 })();

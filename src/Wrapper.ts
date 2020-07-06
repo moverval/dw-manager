@@ -1,15 +1,15 @@
 export default class Wrapper<T> {
-    private _value: T;
+    private Value: T;
 
     constructor(value: T) {
-        this._value = value;
+        this.Value = value;
     }
 
     get value(): T {
-        return this._value;
+        return this.Value;
     }
 
     set value(value: T) {
-        this._value = value;
+        this.Value = value;
     }
 }

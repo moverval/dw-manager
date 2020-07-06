@@ -1,5 +1,5 @@
 {
-    "extends": ["prettier", "tslint:recommended", "tslint-eslint-rules"],
+    "extends": ["tslint-config-prettier", "tslint:recommended", "tslint-eslint-rules"],
     "defaultSeverity": "warning",
     "plugins": ["prettier"],
     "jsRules": {},
@@ -15,7 +15,8 @@
         "ordered-imports": false,
         "quotemark": [true, "double", "avoid-escape"],
         "object-curly-spacing": [true, "always"],
-        "no-console": false
+        "no-console": false,
+        "trailing-comma": false
     },
     "rulesDirectory": []
 }

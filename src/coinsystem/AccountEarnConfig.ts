@@ -1,5 +1,3 @@
-import { NumberMap } from "../Types";
-
 export default class AccountEarnConfig {
     eat: number[];
 

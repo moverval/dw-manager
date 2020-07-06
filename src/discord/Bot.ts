@@ -1,14 +1,16 @@
-import { Client, Message } from "discord.js";
+import { Client } from "discord.js";
 import { CommandMap } from "./Types";
 import EventHandler from "./components/EventHandler";
 import CommandHandler from "./components/CommandHandler";
 import BotTools from "./components/BotTools";
+import ReactionManager from "./components/ReactionManager";
 
 export interface BotInitializerList {
     token: string;
     prefix?: string;
     noEventHandler?: boolean;
     noCommandHandler?: boolean;
+    noReactionManager?: boolean;
     noUtil?: boolean;
 }
 
@@ -19,20 +21,24 @@ export default class Bot {
     token: string;
     eventHandler: EventHandler;
     commandHandler: CommandHandler;
+    reactionManager: ReactionManager;
     util: BotTools;
 
     constructor(options: BotInitializerList) {
-        this.client = new Client();
+        this.client = new Client({
+            partials: ["MESSAGE", "CHANNEL", "REACTION"],
+        });
         this.token = options.token;
         this.prefix = options.prefix;
         if (!options.noEventHandler) {
             this.eventHandler = new EventHandler(this.client);
 
             if (!options.noCommandHandler) {
-                this.commandHandler = new CommandHandler(
-                    this.eventHandler,
-                    this.prefix
-                );
+                this.commandHandler = new CommandHandler(this.eventHandler, this.prefix);
+            }
+
+            if(!options.noReactionManager) {
+                this.reactionManager = new ReactionManager(this.eventHandler);
             }
         }
 

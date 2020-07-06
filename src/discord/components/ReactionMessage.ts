@@ -1,8 +1,8 @@
-import { Message, ReactionEmoji, GuildEmoji, User, PartialUser } from "discord.js";
+import { Message, ReactionEmoji, GuildEmoji, User } from "discord.js";
 import ReactionManager from "./ReactionManager";
 
 export default class ReactionMessage {
-    listener: Map<number, (user?: User | PartialUser) => any>;
+    listener: Map<number, (user?: User) => any>;
     reactions: string[];
     reactionManager: ReactionManager;
 
@@ -13,7 +13,7 @@ export default class ReactionMessage {
         this.Message = message;
         this.reactionManager = reactionManager;
         this.listener = new Map();
-        this.addReaction(0, reaction);
+        this.addReactions(0, reaction);
     }
 
     get message() {
@@ -23,7 +23,7 @@ export default class ReactionMessage {
     /**
      *  First argument is 0
      */
-    setReactionListener(index: number, listener: (user?: User | PartialUser) => any) {
+    setReactionListener(index: number, listener: (user?: User) => any) {
         this.listener.set(index, listener);
     }
 
@@ -31,7 +31,7 @@ export default class ReactionMessage {
         this.reactionManager.removeMessage(this.message.id);
     }
 
-    call(reaction: ReactionEmoji | GuildEmoji, user: User | PartialUser) {
+    call(reaction: ReactionEmoji | GuildEmoji, user: User) {
         const index = this.reactions.indexOf(reaction.name);
         if (index !== -1) {
             if (this.listener.has(index)) {
@@ -40,9 +40,9 @@ export default class ReactionMessage {
         }
     }
 
-    private addReaction(count: number, reactions: string[]) {
+    private addReactions(count: number, reactions: string[]) {
         if (count < reactions.length) {
-            this.Message.react(reactions[count]).then(() => this.addReaction.bind(this)(++count, reactions));
+            this.Message.react(reactions[count]).then(() => this.addReactions.bind(this)(++count, reactions));
         }
     }
 }

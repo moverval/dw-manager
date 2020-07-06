@@ -1,12 +1,4 @@
-import {
-    GuildMember,
-    Invite,
-    Client,
-    PartialGuildMember,
-    Collection,
-    TextChannel,
-    MessageEmbed,
-} from "discord.js";
+import { GuildMember, Invite, Client, PartialGuildMember, Collection, TextChannel, MessageEmbed, User } from "discord.js";
 
 import CoinSystem from "../../coinsystem/CoinSystem";
 import { StringMap } from "../../Types";
@@ -20,7 +12,7 @@ export default async function InviteTracker(
     coinSystem: CoinSystem,
     inviteData: JsonLinker<StringMap<string>>,
     eventHandler: EventHandler,
-    reactionManager: ReactionManager,
+    reactionManager: ReactionManager
 ) {
     InviteTracker.prototype.inviteCount = {};
 
@@ -31,6 +23,10 @@ export default async function InviteTracker(
             .fetchInvites()
             .then((invites) => guildInvites.set(guild.id, invites))
             .catch(console.error);
+    });
+
+    eventHandler.addEventListener("inviteCreate", async (invite) => {
+        guildInvites.set(invite.guild.id, await invite.guild.fetchInvites());
     });
 
     eventHandler.addEventListener("guildMemberAdd", async (member: GuildMember | PartialGuildMember) => {
@@ -53,12 +49,25 @@ export default async function InviteTracker(
                         embed
                             .setTitle("Bestätigung erforderlich")
                             .setDescription(
-                                `${inviteUsed.inviter.username} hat ein Mitglied zu diesem Server eingeladen (Coins: ${account.coins})`
+                                `${inviteUsed.inviter.username} hat ein Mitglied zu diesem Server eingeladen (Coins: ${
+                                    account.coins
+                                })\nGeld überweisen? ${account.coinSystem.earnConfig.get(
+                                    AccountEarnType.INVITED_PERSON
+                                )}C`
                             );
                         const message = await (channel as TextChannel).send(embed);
                         const reactionMessage = reactionManager.createMessage(message, "✅", "✅");
-                        reactionMessage.setReactionListener(0, () => {
-                            account.add(AccountEarnType.USER_JOINED, 1);
+                        reactionMessage.setReactionListener(0, (user) => {
+                            if(mainGuild.members.cache.get(user.id).permissions.has("ADMINISTRATOR")) {
+                                account.add(AccountEarnType.USER_JOINED, 1);
+                                reactionMessage.remove();
+                                message.delete();
+                            }
+                        });
+
+                        reactionMessage.setReactionListener(1, () => {
+                            reactionMessage.remove();
+                            message.delete();
                         });
                     }
                 }

@@ -26,20 +26,20 @@ export default class ReactionManager {
 
     async reactionAddListener(reaction: MessageReaction, user: User | PartialUser) {
         if (reaction.partial) {
-            await reaction.fetch();
+            reaction = await reaction.fetch();
         }
 
         if (user.partial) {
-            await user.fetch();
+            user = await user.fetch();
         }
 
         if (user.bot) {
             return;
         }
 
-        reaction.users.remove(user as User).then(() => {
+        reaction.users.remove(user as User).catch().then(() => {
             if (this.messages[reaction.message.id]) {
-                this.messages[reaction.message.id].call(reaction.emoji, user);
+                this.messages[reaction.message.id].call(reaction.emoji, user as User);
             }
         });
     }

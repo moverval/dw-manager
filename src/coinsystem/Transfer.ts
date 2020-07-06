@@ -1,7 +1,14 @@
-import Account from "./Account";
+import Account, {AccountValue} from "./Account";
 import uuid from "uuid";
+import {SerializeValue, Serializable} from "../filesystem/Types";
+import CoinSystem from "./CoinSystem";
 
-export default class Transfer {
+export default class Transfer implements Serializable<TransferValue> {
+
+    static rootTransfer(coinSystem: CoinSystem) {
+        return new Transfer(Account.rootAccount(coinSystem), Account.rootAccount(coinSystem), 0, "");
+    }
+
     private Id: string;
     private AccountSender: Account;
     private AccountReceiver: Account;
@@ -35,6 +42,33 @@ export default class Transfer {
     get amount(): number {
         return this.Amount;
     }
+
+    serialize() {
+        return {
+            id: this.Id,
+            accountSenderId: this.AccountSender.userId,
+            accountReceiverId: this.AccountReceiver.userId,
+            amount: this.Amount,
+            reason: this.Reason
+        };
+    }
+
+    deserialize(value: TransferValue) {
+        this.Id = value.id;
+        this.AccountSender = this.AccountSender.coinSystem.getAccount(value.accountSenderId);
+        this.AccountReceiver = this.AccountReceiver.coinSystem.getAccount(value.accountReceiverId);
+        this.Amount = value.amount;
+        this.Reason = value.reason;
+        return true;
+    }
+}
+
+export interface TransferValue extends SerializeValue {
+    id: string;
+    accountSenderId: string;
+    accountReceiverId: string;
+    amount: number;
+    reason: string;
 }
 
 export enum TransferPosition {

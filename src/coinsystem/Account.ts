@@ -1,10 +1,15 @@
 import { AccountEarnType } from "./AccountEarnConfig";
 import CoinSystem from "./CoinSystem";
-import Transfer, { TransferPosition } from "./Transfer";
+import Transfer, { TransferPosition, TransferValue } from "./Transfer";
 import { StringMap } from "../Types";
+import { Serializable, SerializeValue } from "../filesystem/Types";
 
-export default class Account {
-    readonly userId: string;
+export default class Account implements Serializable<AccountValue> {
+    static rootAccount(coinSystem: CoinSystem) {
+        return coinSystem.getAccount("*");
+    }
+
+    userId: string;
     coinSystem: CoinSystem;
     private transferQueue: StringMap<Transfer>;
     private AcceptedTransferQueue: StringMap<Transfer>;
@@ -25,6 +30,51 @@ export default class Account {
 
     get acceptedTransferQueue() {
         return this.AcceptedTransferQueue;
+    }
+
+    serialize() {
+        const qTransfer: StringMap<TransferValue> = {};
+        const qAcceptedTransfer: StringMap<TransferValue> = {};
+
+        for (const transferKey in this.transferQueue) {
+            if (this.transferQueue[transferKey]) {
+                qTransfer[transferKey] = this.transferQueue[transferKey].serialize();
+            }
+        }
+
+        for (const transferKey in this.acceptedTransferQueue) {
+            if (this.acceptedTransferQueue[transferKey]) {
+                qAcceptedTransfer[transferKey] = this.acceptedTransferQueue[transferKey].serialize();
+            }
+        }
+
+        return {
+            userId: this.userId,
+            coins: this.Coins,
+            transferQueue: qTransfer,
+            acceptedTransferQueue: qAcceptedTransfer,
+        };
+    }
+
+    deserialize(value: AccountValue) {
+        this.userId = value.userId;
+        this.Coins = value.coins;
+
+        for(const transferKey in value.transferQueue) {
+            if(value.transferQueue[transferKey]) {
+                const transfer = Transfer.rootTransfer(this.coinSystem);
+                transfer.deserialize(value.transferQueue[transferKey]);
+            }
+        }
+
+        for(const transferKey in value.acceptedTransferQueue) {
+            if(value.acceptedTransferQueue[transferKey]) {
+                const transfer = Transfer.rootTransfer(this.coinSystem);
+                transfer.deserialize(value.acceptedTransferQueue[transferKey]);
+            }
+        }
+
+        return true;
     }
 
     add(eat: AccountEarnType, times: number) {
@@ -58,4 +108,11 @@ export default class Account {
             partner.doTransfer(id);
         }
     }
+}
+
+export interface AccountValue {
+    userId: string;
+    coins: number;
+    transferQueue: StringMap<TransferValue>;
+    acceptedTransferQueue: StringMap<TransferValue>;
 }

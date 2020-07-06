@@ -31,6 +31,7 @@ const bot = new Bot({
     rawNavData.load();
     const dpConfig = new DataPoint(rawNavData.value.configDirectory);
     const dpData = new DataPoint(rawNavData.value.dataDirectory);
+    bot.util.dp = dpData;
     const documentations = new JsonLinker<StringMap<DocumentationObject>>(dpConfig, "help_information.json");
     documentations.addLoadingComponent(new DocumentationObjectParser(dpConfig, documentations));
     documentations.load();
@@ -54,7 +55,7 @@ const bot = new Bot({
     bot.commandHandler.registerCommand(new HelpCommand(bot, "help"));
     bot.commandHandler.registerCommand(new CoinCommand(bot, "coins", coinSystem));
     bot.commandHandler.registerCommand(new CheckCommand(bot, "check", coinSystem));
-    bot.commandHandler.registerCommand(new TestReaction(bot, "reaction"));
+    bot.commandHandler.registerCommand(new TestReaction(bot, "reaction", coinSystem));
 
     bot.commandHandler.assignDocumentations(documentations);
 

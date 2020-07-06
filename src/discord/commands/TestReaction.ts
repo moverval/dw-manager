@@ -1,7 +1,17 @@
 import Command, { ReturnValue } from "../abstract/Command";
 import { Message, MessageEmbed } from "discord.js";
+import Serializer from "../../filesystem/Serializer";
+import CoinSystem from "../../coinsystem/CoinSystem";
+import Bot from "../Bot";
 
 export default class TestReaction extends Command {
+    coinSystem: CoinSystem;
+
+    constructor(bot: Bot, invoke: string, coinSystem: CoinSystem) {
+        super(bot, invoke);
+        this.coinSystem = coinSystem;
+    }
+
     run(message: Message, args: string[]): ReturnValue {
         if (args.length === 0) {
             message.channel.send("Hello World!").then((newMessage) => {
@@ -52,6 +62,9 @@ export default class TestReaction extends Command {
                         interactiveMessage.delete();
                     });
                 });
+            } else if(args[0] === "savecs") {
+                Serializer.writeObject(this.bot.util.dp.parse("coinSystem.json"), this.coinSystem);
+                message.channel.send("CoinSystem saved.");
             }
         }
         return ReturnValue.SUCCESS;

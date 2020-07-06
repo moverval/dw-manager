@@ -1,8 +1,8 @@
 import { StringMap } from "../Types";
 import Wrapper from "../Wrapper";
 import AccountEarnConfig from "./AccountEarnConfig";
-import Account from "./Account";
-import { Serializable } from "../filesystem/Types";
+import Account, {AccountValue} from "./Account";
+import { Serializable, SerializeValue } from "../filesystem/Types";
 import Transfer, { TransferPosition } from "./Transfer";
 
 export default class CoinSystem implements Serializable<CoinSystemSerialized> {
@@ -66,20 +66,36 @@ export default class CoinSystem implements Serializable<CoinSystemSerialized> {
     }
 
     serialize() {
+        const accountData: StringMap<AccountValue> = {};
+
+        for(const account in this.Accounts) {
+            if(this.Accounts[account]) {
+                accountData[account] = this.Accounts[account].serialize();
+            }
+        }
+
         return {
-            accounts: this.Accounts,
-            earnConfigEat: this.EarnConfig.value.eat,
+            accounts: accountData
         };
     }
 
-    deserialize(s: CoinSystemSerialized) {
-        this.Accounts = s.accounts;
-        this.EarnConfig.value.eat = s.earnConfigEat;
+    deserialize(value: CoinSystemSerialized) {
+        const accounts: StringMap<Account> = {};
+
+        for(const accountKey in value.accounts) {
+            if(value.accounts[accountKey]) {
+                const account = Account.rootAccount(this);
+                account.deserialize(value.accounts[accountKey]);
+                accounts[accountKey] = account;
+            }
+        }
+
+        this.Accounts = accounts;
+
         return true;
     }
 }
 
-interface CoinSystemSerialized {
-    accounts: StringMap<Account>;
-    earnConfigEat: number[];
+interface CoinSystemSerialized extends SerializeValue {
+    accounts: StringMap<AccountValue>;
 }

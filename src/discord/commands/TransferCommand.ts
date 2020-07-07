@@ -40,7 +40,8 @@ export default class TransferCommand extends Command {
                             .addField(
                                 "Details",
                                 `TransferID: ${transfer.id}; Sender: ${message.author.id}; Receiver: ${receiver.id}; Amount: ${transfer.amount}`
-                            );
+                            )
+                            .addField("Status", "Interaktion erforderlich");
 
                         message.channel.send(embed).then((interactiveMessage) => {
                             const reactionMessage = this.bot.reactionManager.createMessage(
@@ -48,11 +49,17 @@ export default class TransferCommand extends Command {
                                 "✅",
                                 "❎"
                             );
+
+                            const timeoutHandler = setTimeout(() => abort(message.author), 60000);
+
                             reactionMessage.setReactionListener(0, (user) => {
                                 if (user.id === message.author.id) {
+                                    clearTimeout(timeoutHandler);
                                     this.coinSystem.makeTransfer(transfer.id, accountSender, accountReceiver);
                                     this.coinSystem.removeTransfer(transfer.id);
                                     reactionMessage.remove();
+                                    embed.fields[1].value = "Akzeptiert";
+                                    interactiveMessage.edit(embed);
                                     interactiveMessage.reactions.removeAll();
                                 }
                             });
@@ -60,11 +67,12 @@ export default class TransferCommand extends Command {
                                 if (user.id === message.author.id) {
                                     this.coinSystem.removeTransfer(transfer.id);
                                     reactionMessage.remove();
+                                    embed.fields[1].value = "Abgelehnt";
+                                    interactiveMessage.edit(embed);
                                     interactiveMessage.reactions.removeAll();
                                 }
                             };
 
-                            const timeoutHandler = setTimeout(() => abort(message.author), 60000);
 
                             reactionMessage.setReactionListener(1, (user) => {
                                 clearTimeout(timeoutHandler);

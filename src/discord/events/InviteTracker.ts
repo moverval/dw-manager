@@ -4,10 +4,7 @@ import CoinSystem from "../../coinsystem/CoinSystem";
 import { AccountEarnType } from "../../coinsystem/AccountEarnConfig";
 import Bot from "../Bot";
 
-export default async function InviteTracker(
-    coinSystem: CoinSystem,
-    bot: Bot
-) {
+export default async function InviteTracker(coinSystem: CoinSystem, bot: Bot) {
     const guildInvites: Map<string, Collection<string, Invite>> = new Map();
 
     bot.client.guilds.cache.forEach((guild) => {
@@ -25,6 +22,11 @@ export default async function InviteTracker(
         const cachedInvites = guildInvites.get(member.guild.id);
         const newInvites = await member.guild.fetchInvites();
         guildInvites.set(member.guild.id, newInvites);
+
+        if(coinSystem.isAccount(member.id)) {
+            return;
+        }
+        coinSystem.createAccount(member.id);
 
         try {
             const inviteUsed = newInvites.find((invite) => cachedInvites.get(invite.code).uses < invite.uses);
@@ -48,7 +50,7 @@ export default async function InviteTracker(
                         const message = await (channel as TextChannel).send(embed);
                         const reactionMessage = bot.reactionManager.createMessage(message, "✅", "❎");
                         reactionMessage.setReactionListener(0, (user) => {
-                            if(mainGuild.members.cache.get(user.id).permissions.has("ADMINISTRATOR")) {
+                            if (mainGuild.members.cache.get(user.id).permissions.has("ADMINISTRATOR")) {
                                 account.add(AccountEarnType.INVITED_PERSON, 1);
                                 reactionMessage.remove();
                                 message.delete();
@@ -56,13 +58,15 @@ export default async function InviteTracker(
                         });
 
                         reactionMessage.setReactionListener(1, (user) => {
-                            if(mainGuild.members.cache.get(user.id).permissions.has("ADMINISTRATOR")) {
+                            if (mainGuild.members.cache.get(user.id).permissions.has("ADMINISTRATOR")) {
                                 reactionMessage.remove();
                                 message.delete();
                             }
                         });
                     } else {
-                        console.log("Confirmation channel missing. Make sure that a channel id is given in the .env file");
+                        console.log(
+                            "Confirmation channel missing. Make sure that a channel id is given in the .env file"
+                        );
                     }
                 }
             }

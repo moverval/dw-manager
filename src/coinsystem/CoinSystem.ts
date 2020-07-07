@@ -1,7 +1,7 @@
 import { StringMap } from "../Types";
 import Wrapper from "../Wrapper";
 import AccountEarnConfig from "./AccountEarnConfig";
-import Account, {AccountValue} from "./Account";
+import Account, { AccountValue } from "./Account";
 import { Serializable, SerializeValue } from "../filesystem/Types";
 import Transfer, { TransferPosition } from "./Transfer";
 
@@ -47,14 +47,21 @@ export default class CoinSystem implements Serializable<CoinSystemSerialized> {
      */
     getAccount(id: string) {
         if (!this.isAccount(id)) {
-            this.addAccount(new Account(this, id));
+            this.createAccount(id);
         }
 
         return this.accounts[id];
     }
 
+    /*
+     * Creates or overrides an Account if userId was already present
+     */
+    createAccount(id: string) {
+        this.addAccount(new Account(this, id));
+    }
+
     isAccount(accountId: string) {
-        return this.Accounts[accountId] !== undefined;
+        return typeof this.Accounts[accountId] !== "undefined";
     }
 
     addAccount(account: Account) {
@@ -68,22 +75,22 @@ export default class CoinSystem implements Serializable<CoinSystemSerialized> {
     serialize() {
         const accountData: StringMap<AccountValue> = {};
 
-        for(const account in this.Accounts) {
-            if(this.Accounts[account]) {
+        for (const account in this.Accounts) {
+            if (this.Accounts[account]) {
                 accountData[account] = this.Accounts[account].serialize();
             }
         }
 
         return {
-            accounts: accountData
+            accounts: accountData,
         };
     }
 
     deserialize(value: CoinSystemSerialized) {
         const accounts: StringMap<Account> = {};
 
-        for(const accountKey in value.accounts) {
-            if(value.accounts[accountKey]) {
+        for (const accountKey in value.accounts) {
+            if (value.accounts[accountKey]) {
                 const account = Account.rootAccount(this);
                 account.deserialize(value.accounts[accountKey]);
                 accounts[accountKey] = account;

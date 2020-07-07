@@ -36,5 +36,11 @@
         "nav": null,
         "description": "#file: ./markdown/help/pingCommand.md",
         "childreen": []
+    },
+    "coins": {
+        "title": "Coins",
+        "nav": null,
+        "description": "Dieser Befehl zeigt deine Menge an Münzen die du zur Verfügung hast",
+        "childreen": []
     }
 }

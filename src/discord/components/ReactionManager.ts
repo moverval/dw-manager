@@ -37,10 +37,9 @@ export default class ReactionManager {
             return;
         }
 
-        reaction.users.remove(user as User).catch().then(() => {
-            if (this.messages[reaction.message.id]) {
-                this.messages[reaction.message.id].call(reaction.emoji, user as User);
-            }
-        });
+        if (this.messages[reaction.message.id]) {
+            this.messages[reaction.message.id].call(reaction.emoji, user as User);
+            reaction.users.remove(user as User).catch();
+        }
     }
 }

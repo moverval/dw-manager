@@ -7,10 +7,12 @@ import Transfer, { TransferPosition } from "./Transfer";
 
 export default class CoinSystem implements Serializable<CoinSystemSerialized> {
     private Accounts: StringMap<Account>;
+    private TransferIds: StringMap<Transfer>;
     private EarnConfig: Wrapper<AccountEarnConfig>;
 
     constructor(earnConfig?: AccountEarnConfig) {
         this.Accounts = {};
+        this.TransferIds = {};
 
         if (earnConfig) {
             this.EarnConfig = new Wrapper(earnConfig);
@@ -18,6 +20,7 @@ export default class CoinSystem implements Serializable<CoinSystemSerialized> {
             this.EarnConfig = new Wrapper(null);
         }
     }
+
     get earnConfig(): AccountEarnConfig {
         return this.EarnConfig.value;
     }
@@ -30,15 +33,8 @@ export default class CoinSystem implements Serializable<CoinSystemSerialized> {
         return this.Accounts;
     }
 
-    addTransferRequest(sender: Account, receiver: Account, amount: number) {
-        const transfer = new Transfer(sender, receiver, amount);
-        sender.addTransfer(transfer);
-        receiver.addTransfer(transfer);
-        return transfer;
-    }
-
-    makeTransfer(transfer: Transfer) {
-        transfer.accountSender.doTransfer(transfer.id, TransferPosition.SENDER);
+    get transferIds(): StringMap<Transfer> {
+        return this.TransferIds;
     }
 
     /**
@@ -51,6 +47,32 @@ export default class CoinSystem implements Serializable<CoinSystemSerialized> {
         }
 
         return this.accounts[id];
+    }
+
+    registerTransfer(transfer: Transfer) {
+        this.TransferIds[transfer.id] = transfer;
+    }
+
+    isTransfer(transferId: string) {
+        return typeof this.TransferIds[transferId] !== "undefined";
+    }
+
+    removeTransfer(transferId: string) {
+        this.TransferIds[transferId] = undefined;
+    }
+
+    makeTransfer(transferId: string, sender: Account, receiver: Account) {
+        if(this.isTransfer(transferId)) {
+            const transfer = this.TransferIds[transferId];
+            if(sender.makeTransfer(transfer, TransferPosition.SENDER)) {
+                receiver.makeTransfer(this.TransferIds[transferId], TransferPosition.RECEIVER);
+            } else {
+                return false;
+            }
+            return true;
+        }
+
+        return false;
     }
 
     /*
@@ -87,22 +109,18 @@ export default class CoinSystem implements Serializable<CoinSystemSerialized> {
     }
 
     deserialize(value: CoinSystemSerialized) {
-        const accounts: StringMap<Account> = {};
-
         for (const accountKey in value.accounts) {
             if (value.accounts[accountKey]) {
-                const account = Account.rootAccount(this);
+                const account = this.getAccount(accountKey);
                 account.deserialize(value.accounts[accountKey]);
-                accounts[accountKey] = account;
+                this.Accounts[accountKey] = account;
             }
         }
-
-        this.Accounts = accounts;
 
         return true;
     }
 }
 
-interface CoinSystemSerialized extends SerializeValue {
+export interface CoinSystemSerialized extends SerializeValue {
     accounts: StringMap<AccountValue>;
 }

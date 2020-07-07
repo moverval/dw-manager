@@ -62,13 +62,30 @@ export default class CoinSystem implements Serializable<CoinSystemSerialized> {
     }
 
     makeTransfer(transferId: string, sender: Account, receiver: Account) {
-        if(this.isTransfer(transferId)) {
+        if (this.isTransfer(transferId)) {
             const transfer = this.TransferIds[transferId];
-            if(sender.makeTransfer(transfer, TransferPosition.SENDER)) {
-                receiver.makeTransfer(this.TransferIds[transferId], TransferPosition.RECEIVER);
+            if (sender.makeTransfer(transfer, TransferPosition.SENDER)) {
+                receiver.makeTransfer(transfer, TransferPosition.RECEIVER);
             } else {
                 return false;
             }
+            return true;
+        }
+
+        return false;
+    }
+
+    makeSystemTransfer(transferId: string, senderId: string, receiverId: string) {
+        if (this.isTransfer(transferId)) {
+            const transfer = this.TransferIds[transferId];
+            if (senderId) {
+                this.getAccount(senderId).makeTransfer(transfer, TransferPosition.SENDER);
+            }
+
+            if (receiverId) {
+                this.getAccount(receiverId).makeTransfer(transfer, TransferPosition.RECEIVER);
+            }
+
             return true;
         }
 

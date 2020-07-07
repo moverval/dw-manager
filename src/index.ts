@@ -17,6 +17,7 @@ import InviteTracker from "./discord/events/InviteTracker";
 import TestReaction from "./discord/commands/TestReaction";
 import TransferCommand from "./discord/commands/TransferCommand";
 import Serializer from "./filesystem/Serializer";
+import AdUpvote, {AdChannelInformation} from "./discord/events/AdUpvote";
 
 dotenv.config();
 
@@ -58,6 +59,9 @@ const bot = new Bot({
         coinSystem.deserialize(coinSystemLinker.value["*"]);
     }
 
+    const channelInformationLinker = new JsonLinker<StringMap<AdChannelInformation>>(dpConfig, "channelmarker_debug.json");
+    channelInformationLinker.load();
+
     await bot.login();
 
     bot.commandHandler.registerCommand(new PingCommand(bot, "ping"));
@@ -71,6 +75,7 @@ const bot = new Bot({
 
     bot.eventHandler.addEventListener("ready", ReadyEvent);
     bot.eventHandler.addEventListener("message", WordManager(coinSystem));
+    bot.eventHandler.addEventListener("message", AdUpvote(channelInformationLinker));
 
     InviteTracker(coinSystem, bot);
 

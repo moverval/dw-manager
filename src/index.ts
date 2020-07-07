@@ -79,6 +79,7 @@ const bot = new Bot({
         Serializer.writeObject(dpData.parse("coinSystem.json"), coinSystem);
         process.exit(0);
     };
+
     process.on("exit", closeHandler);
     process.on("SIGINT", closeHandler);
     process.on("SIGUSR1", closeHandler);

@@ -14,7 +14,7 @@ export default class TransferCommand extends Command {
     }
 
     run(message: Message, args: string[]): ReturnValue {
-        if (args.length === 2) {
+        if (message.mentions.users.size === 1) {
             const receiver = message.mentions.users.array()[0];
 
             if (receiver.id === message.author.id) {
@@ -23,7 +23,7 @@ export default class TransferCommand extends Command {
             }
 
             if (receiver) {
-                const amount = Number(args[1]);
+                const amount = Number(args[0]);
 
                 if (!isNaN(amount)) {
                     const accountSender = this.coinSystem.getAccount(message.author.id);

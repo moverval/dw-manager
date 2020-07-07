@@ -33,4 +33,5 @@ export enum ReturnValue {
     FAILED_EXECUTING,
     WRONG_BOOTUP,
     UNKNOWN_PARAMETER,
+    WRONG_NOTATION
 }

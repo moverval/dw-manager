@@ -42,5 +42,11 @@
         "nav": null,
         "description": "Dieser Befehl zeigt deine Menge an Münzen die du zur Verfügung hast",
         "childreen": []
+    },
+    "transfer": {
+        "title": "Transfer",
+        "nav": "null",
+        "description": "#file: ./markdown/help/transferCommand.md",
+        "childreen": []
     }
 }

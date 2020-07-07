@@ -1,10 +1,34 @@
 import EventHandler from "./EventHandler";
 import { CommandMap } from "../Types";
-import { Message } from "discord.js";
-import Command from "../abstract/Command";
+import { Message, MessageEmbed } from "discord.js";
+import Command, { ReturnValue } from "../abstract/Command";
 import { DocumentationLinker } from "../loaders/JsonLinker";
 
 export default class CommandHandler {
+    private static makeMessageListener(prefix: string, commands: CommandMap) {
+        return (message: Message) => {
+            if (message.content.startsWith(prefix) && !message.member.user.bot) {
+                const args = message.content.split(" ");
+                const invoke = args.shift().slice(prefix.length);
+                if (commands[invoke]) {
+                    const value = commands[invoke].run(message, args);
+
+                    switch (value) {
+                        case ReturnValue.WRONG_NOTATION: {
+                            const embed = new MessageEmbed();
+                            embed
+                                .setTitle("Falsche Schreibweise")
+                                .setDescription(
+                                    `Nutze \`\`${prefix}help ${commands[invoke].invoke}\`\` um Hilfe für den Befehl zu erhalten`
+                                );
+                            message.channel.send(embed);
+                        }
+                    }
+                }
+            }
+        };
+    }
+
     eventHandler: EventHandler;
     commands: CommandMap = {};
     readonly prefix: string;
@@ -30,18 +54,6 @@ export default class CommandHandler {
 
     getPrefix() {
         return this.prefix;
-    }
-
-    private static makeMessageListener(prefix: string, commands: CommandMap) {
-        return (message: Message) => {
-            if (message.content.startsWith(prefix) && !message.member.user.bot) {
-                const args = message.content.split(" ");
-                const invoke = args.shift().slice(prefix.length);
-                if (commands[invoke]) {
-                    commands[invoke].run(message, args);
-                }
-            }
-        };
     }
 
     assignDocumentations(linker: DocumentationLinker) {

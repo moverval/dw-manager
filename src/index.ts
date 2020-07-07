@@ -16,6 +16,7 @@ import CheckCommand from "./discord/commands/admin/CheckCommand";
 import InviteTracker from "./discord/events/InviteTracker";
 import TestReaction from "./discord/commands/TestReaction";
 import TransferCommand from "./discord/commands/TransferCommand";
+import Serializer from "./filesystem/Serializer";
 
 dotenv.config();
 
@@ -72,4 +73,15 @@ const bot = new Bot({
     bot.eventHandler.addEventListener("message", WordManager(coinSystem));
 
     InviteTracker(coinSystem, bot);
+
+    process.stdin.resume();
+    const closeHandler = () => {
+        Serializer.writeObject(dpData.parse("coinSystem.json"), coinSystem);
+        process.exit(0);
+    };
+    process.on("exit", closeHandler);
+    process.on("SIGINT", closeHandler);
+    process.on("SIGUSR1", closeHandler);
+    process.on("SIGUSR2", closeHandler);
+    process.on("uncaughtException", closeHandler);
 })();

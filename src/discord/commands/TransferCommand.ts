@@ -17,6 +17,11 @@ export default class TransferCommand extends Command {
         if (args.length === 2) {
             const receiver = message.mentions.users.array()[0];
 
+            if (receiver.id === message.author.id) {
+                message.channel.send("...");
+                return;
+            }
+
             if (receiver) {
                 const amount = Number(args[1]);
 
@@ -66,9 +71,21 @@ export default class TransferCommand extends Command {
                                 abort(user);
                             });
                         });
+                    } else {
+                        const embed = new MessageEmbed();
+                        embed
+                            .setTitle("Zu wenig Geld")
+                            .setDescription("Du besitzt zu wenig Geld um diesen Betrag zu überweisen");
+                        message.channel.send(embed);
                     }
+                } else {
+                    return ReturnValue.WRONG_NOTATION;
                 }
+            } else {
+                return ReturnValue.WRONG_NOTATION;
             }
+        } else {
+            return ReturnValue.WRONG_NOTATION;
         }
 
         return ReturnValue.SUCCESS;

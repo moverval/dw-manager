@@ -20,9 +20,14 @@ export default class BotTools {
     }
 
     getGlobalVariables() {
+        const random = Math.floor(Math.random() * this.bot.client.users.cache.size);
+        const randomUsername = this.bot.client.users.cache.array()[random].username;
+
         return {
             prefix: this.bot.commandHandler.getPrefix(),
             ping: "" + this.bot.client.ws.ping,
+            randomUsername,
+            randomMention: "@" + randomUsername
         };
     }
 }

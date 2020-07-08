@@ -6,6 +6,7 @@ import Bot from "../Bot";
 import { ReactionType } from "../components/ReactionMessage";
 import CoinSystem from "../../coinsystem/CoinSystem";
 import { AccountEarnType } from "../../coinsystem/AccountEarnConfig";
+import schedule from "node-schedule";
 
 export default function AdUpvote(
     channelInformationLinker: JsonLinker<StringMap<AdChannelInformation>>,
@@ -14,8 +15,13 @@ export default function AdUpvote(
 ) {
     const reactionManager = new ReactionManager(bot.eventHandler, ReactionHandle.COUNTER);
 
-    const voteMap: StringMap<number> = {};
-    const voteReversedMap: StringMap<number> = {};
+    let voteMap: StringMap<number> = {};
+    let voteReversedMap: StringMap<number> = {};
+
+    schedule.scheduleJob({ hour: 0, minute: 0 }, () => {
+        voteMap = {};
+        voteReversedMap = {};
+    });
 
     bot.eventHandler.addEventListener("message", (message: Message) => {
         const channelInformation = channelInformationLinker.value[message.channel.id];

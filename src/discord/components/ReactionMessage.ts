@@ -2,7 +2,7 @@ import { Message, ReactionEmoji, GuildEmoji, User } from "discord.js";
 import ReactionManager from "./ReactionManager";
 
 export default class ReactionMessage {
-    listener: Map<number, (user?: User) => any>;
+    listener: Map<number, (user?: User, reactionType?: ReactionType) => any>;
     reactions: string[];
     reactionManager: ReactionManager;
 
@@ -23,7 +23,7 @@ export default class ReactionMessage {
     /**
      *  First argument is 0
      */
-    setReactionListener(index: number, listener: (user?: User) => any) {
+    setReactionListener(index: number, listener: (user?: User, reactionType?: ReactionType) => any) {
         this.listener.set(index, listener);
     }
 
@@ -31,11 +31,11 @@ export default class ReactionMessage {
         this.reactionManager.removeMessage(this.message.id);
     }
 
-    call(reaction: ReactionEmoji | GuildEmoji, user: User) {
+    call(reaction: ReactionEmoji | GuildEmoji, user: User, reactionType: ReactionType = ReactionType.CALL) {
         const index = this.reactions.indexOf(reaction.name);
         if (index !== -1) {
             if (this.listener.has(index)) {
-                this.listener.get(index).bind(this)(user);
+                this.listener.get(index).bind(this)(user, reactionType);
             }
         }
     }
@@ -45,4 +45,8 @@ export default class ReactionMessage {
             this.Message.react(reactions[count]).then(() => this.addReactions.bind(this)(++count, reactions));
         }
     }
+}
+
+export enum ReactionType {
+    CALL, CANCEL
 }

@@ -1,17 +1,75 @@
-import { Message } from "discord.js";
+import { Message, User } from "discord.js";
 import JsonLinker from "../loaders/JsonLinker";
 import { StringMap } from "../../Types";
+import ReactionManager, { ReactionHandle } from "../components/ReactionManager";
+import Bot from "../Bot";
+import { ReactionType } from "../components/ReactionMessage";
+import CoinSystem from "../../coinsystem/CoinSystem";
+import { AccountEarnType } from "../../coinsystem/AccountEarnConfig";
 
-export default function AdUpvote(channelInformationLinker: JsonLinker<StringMap<AdChannelInformation>>) {
-    return (message: Message) => {
+export default function AdUpvote(
+    channelInformationLinker: JsonLinker<StringMap<AdChannelInformation>>,
+    bot: Bot,
+    coinSystem: CoinSystem
+) {
+    const reactionManager = new ReactionManager(bot.eventHandler, ReactionHandle.COUNTER);
+
+    const voteMap: StringMap<number> = {};
+    const voteReversedMap: StringMap<number> = {};
+
+    bot.eventHandler.addEventListener("message", (message: Message) => {
         const channelInformation = channelInformationLinker.value[message.channel.id];
 
         if (channelInformation) {
             if (channelInformation.ad) {
-                message.react("⬆️");
+                const reactionMessage = reactionManager.createMessage(message, "⬆️");
+                reactionMessage.setReactionListener(0, (user, reactionType) => {
+                    if (user.bot) {
+                        return;
+                    }
+                    if (reactionType === ReactionType.CALL) {
+                        if (user.id === message.author.id) {
+                            const reaction = message.reactions.cache.find(
+                                (subReaction) => subReaction.emoji.name === "⬆️"
+                            );
+                            reaction.users.remove(user);
+                            return;
+                        }
+
+                        if(voteMap[user.id] && voteMap[user.id] > 9) {
+                            const reaction = message.reactions.cache.find(
+                                (subReaction) => subReaction.emoji.name === "⬆️"
+                            );
+                            reaction.users.remove(user);
+                            voteMap[user.id] += 1;
+                            return;
+                        }
+
+                        if(!voteMap[user.id]) {
+                            voteMap[user.id] = 0;
+                        }
+
+                        voteMap[user.id] += 1;
+                        if (voteReversedMap[user.id] && voteReversedMap[user.id] > 0) {
+                            voteReversedMap[user.id] -= 1;
+                        } else {
+                            const voteUserAccount = coinSystem.getAccount(user.id);
+                            voteUserAccount.add(AccountEarnType.AD_GOOD_UPVOTE, 1);
+                        }
+
+                    } else if (reactionType === ReactionType.CANCEL) {
+                        voteMap[user.id] -= 1;
+
+                        if(voteMap[user.id] > 9) {
+                            return;
+                        }
+
+                        voteReversedMap[user.id] += 1;
+                    }
+                });
             }
         }
-    };
+    });
 }
 
 export interface AdChannelInformation {

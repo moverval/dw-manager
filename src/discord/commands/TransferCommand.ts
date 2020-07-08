@@ -58,24 +58,28 @@ export default class TransferCommand extends Command {
                                     this.coinSystem.makeTransfer(transfer.id, accountSender, accountReceiver);
                                     this.coinSystem.removeTransfer(transfer.id);
                                     reactionMessage.remove();
+                                    embed.setTitle(`Münzen an ${receiver.username} übertragen`);
                                     embed.fields[1].value = "Akzeptiert";
                                     interactiveMessage.edit(embed);
                                     interactiveMessage.reactions.removeAll();
                                 }
                             });
+
                             const abort = (user: User) => {
                                 if (user.id === message.author.id) {
+                                    clearTimeout(timeoutHandler);
                                     this.coinSystem.removeTransfer(transfer.id);
                                     reactionMessage.remove();
+                                    embed.setTitle(`Münzen an ${receiver.username} nicht übertragen`);
                                     embed.fields[1].value = "Abgelehnt";
                                     interactiveMessage.edit(embed);
                                     interactiveMessage.reactions.removeAll();
                                 }
                             };
 
+                            embed.setDescription("Dieser Vorgang kann nicht wieder rückgängig gemacht werden");
 
                             reactionMessage.setReactionListener(1, (user) => {
-                                clearTimeout(timeoutHandler);
                                 abort(user);
                             });
                         });

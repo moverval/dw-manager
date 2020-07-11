@@ -17,7 +17,8 @@
         "object-curly-spacing": [true, "always"],
         "no-console": false,
         "trailing-comma": false,
-        "array-type": false
+        "array-type": false,
+        "no-bitwise": false
     },
     "rulesDirectory": []
 }

@@ -18,6 +18,7 @@ import TestReaction from "./discord/commands/TestReaction";
 import TransferCommand from "./discord/commands/TransferCommand";
 import Serializer from "./filesystem/Serializer";
 import AdUpvote, { AdChannelInformation } from "./discord/events/AdUpvote";
+import scheduler from "node-schedule";
 
 dotenv.config();
 

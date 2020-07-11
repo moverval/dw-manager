@@ -2,6 +2,7 @@ import { AccountEarnType } from "./AccountEarnConfig";
 import CoinSystem from "./CoinSystem";
 import Transfer, { TransferPosition } from "./Transfer";
 import { Serializable } from "../filesystem/Types";
+import Inventory from "./shop/Inventory";
 
 export default class Account implements Serializable<AccountValue> {
     static rootAccount(coinSystem: CoinSystem) {
@@ -10,11 +11,13 @@ export default class Account implements Serializable<AccountValue> {
 
     userId: string;
     coinSystem: CoinSystem;
+    inventory: Inventory;
 
     private Coins: number;
 
     constructor(coinSystem: CoinSystem, userId: string) {
         this.userId = userId;
+        this.inventory = new Inventory(this.coinSystem.shopSystem);
         this.coinSystem = coinSystem;
         this.Coins = coinSystem.earnConfig.get(AccountEarnType.USER_JOINED);
     }

@@ -17,7 +17,7 @@ export default class Account implements Serializable<AccountValue> {
 
     constructor(coinSystem: CoinSystem, userId: string) {
         this.userId = userId;
-        this.inventory = new Inventory(this.coinSystem.shopSystem);
+        this.inventory = new Inventory(this.coinSystem.shopSystem, this);
         this.coinSystem = coinSystem;
         this.Coins = coinSystem.earnConfig.get(AccountEarnType.USER_JOINED);
     }

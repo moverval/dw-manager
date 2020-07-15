@@ -25,7 +25,9 @@ export default class Inventory {
             structure: itemStructure,
             childreen: [],
             items: [],
-            nav: null
+            nav: null,
+            structureConfig: {},
+            structureConfigValid: true
         };
 
         this.inventoryData.push(itemStructureObject);

@@ -4,7 +4,7 @@ import AccountEarnConfig from "./AccountEarnConfig";
 import Account, { AccountValue } from "./Account";
 import { Serializable, SerializeValue } from "../filesystem/Types";
 import Transfer, { TransferPosition } from "./Transfer";
-import ShopSystem, {SerializableShopRegister} from "./shop/ShopSystem";
+import ShopSystem, { SerializableShopRegister } from "./shop/ShopSystem";
 
 export default class CoinSystem implements Serializable<CoinSystemSerialized> {
     private Accounts: StringMap<Account>;
@@ -130,12 +130,12 @@ export default class CoinSystem implements Serializable<CoinSystemSerialized> {
 
         return {
             accounts: accountData,
-            shopSystem: this.ShopSystem.serialize()
+            // shopSystem: this.ShopSystem.serialize(),
         };
     }
 
     deserialize(value: CoinSystemSerialized) {
-        this.ShopSystem.deserialize(value.shopSystem);
+        // this.ShopSystem.deserialize(value.shopSystem);
 
         for (const accountKey in value.accounts) {
             if (value.accounts[accountKey]) {

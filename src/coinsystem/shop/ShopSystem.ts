@@ -3,6 +3,8 @@ import { Serializable, SerializeValue } from "../../filesystem/Types";
 import { StringMap } from "../../Types";
 import ItemMask from "./ItemMask";
 import Account from "../Account";
+import lodash from "lodash";
+import EquipableRoleMask from "../../discord/components/EquipableRoleMask";
 
 export default class ShopSystem implements Serializable<SerializableShopRegister> {
     static findItem<T>(list: ShopItem[], getter: (s: ShopItem) => T, value: T) {
@@ -15,6 +17,10 @@ export default class ShopSystem implements Serializable<SerializableShopRegister
 
     static findNav(register: ShopRegister, key: string) {
         return register.childreen.find((shopReg) => shopReg.nav === key);
+    }
+
+    static findNavIndex(register: ShopRegister, key: string) {
+        return register.childreen.findIndex((shopReg) => shopReg.nav === key);
     }
 
     static getPrice(shopItem: ShopItem) {
@@ -51,6 +57,59 @@ export default class ShopSystem implements Serializable<SerializableShopRegister
         return mark.items.sort((itemA, itemB) => itemA.price - itemB.price);
     }
 
+    static rename(mark: ShopRegister, nav: string, name: string) {
+        const realElement = ShopSystem.findNav(mark, name);
+        if(!realElement) {
+            const oldElement = ShopSystem.findNav(mark, nav);
+            if(nav) {
+                oldElement.nav = name.split(".")[0];
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    static structureConfigSet(mark: ShopRegister, point: string, value: string | number) {
+        const type = typeof mark.structureConfig[point];
+        const typeValue = typeof value;
+
+        if(type === "undefined") {
+            return StructureConfigStatus.NO_PARAMETER;
+        }
+
+        if(type === typeValue) {
+            mark.structureConfig[point] = value;
+            return StructureConfigStatus.SUCCESS;
+        } else {
+            return StructureConfigStatus.INVALID_TYPE;
+        }
+    }
+
+    static getStructureConfigType(mark: ShopRegister, point: string) {
+        return typeof mark.structureConfig[point];
+    }
+
+    static point_create(mark: ShopRegister, current: string) {
+        const next: ShopRegister = {
+            name: null,
+            nav: current,
+            items: [],
+            structure: "none",
+            childreen: [],
+            structureConfig: {},
+            structureConfigValid: true
+        };
+
+        mark.childreen.push(next);
+
+        return next;
+    }
+
+    static point_cancel(mark: ShopRegister, current: string): ShopRegister {
+        return null;
+    }
+
     coinSystem: CoinSystem;
     shopRegister: ShopRegister;
     shopItemStructure: StringMap<ItemMask>;
@@ -63,12 +122,34 @@ export default class ShopSystem implements Serializable<SerializableShopRegister
             items: [],
             structure: "none",
             childreen: [],
+            structureConfig: {},
+            structureConfigValid: true
         };
         this.shopItemStructure = {};
     }
 
+    addShopItemStructure(name: string, structure: ItemMask) {
+        this.shopItemStructure[name] = structure;
+    }
+
+    isItemStructure(name: string) {
+        return typeof this.shopItemStructure[name] !== "undefined";
+    }
+
     getStructure(mark: ShopRegister) {
         return this.shopItemStructure[mark.structure];
+    }
+
+    makeMarkStructure(mark: ShopRegister) {
+        const structureObject = this.shopItemStructure[mark.structure];
+        mark.structureConfig = lodash.cloneDeep(structureObject.config);
+    }
+
+    markStructureVerify(mark: ShopRegister) {
+        const structureObject = this.shopItemStructure[mark.structure];
+        const verified = structureObject.validConfig(mark.structureConfig);
+        mark.structureConfigValid = verified;
+        return verified;
     }
 
     buyItem(mark: ShopRegister, account: Account, sorter: (mark: ShopRegister) => ShopItem[]): BuyStatus {
@@ -106,7 +187,7 @@ export default class ShopSystem implements Serializable<SerializableShopRegister
         return true;
     }
 
-    point(navigation: string) {
+    point(navigation: string, nf: (m: ShopRegister, s: string) => ShopRegister) {
         const keys = navigation.split(".");
 
         const construct = (splits: string[], mark: ShopRegister): ShopRegister => {
@@ -115,15 +196,10 @@ export default class ShopSystem implements Serializable<SerializableShopRegister
             let next = ShopSystem.findNav(mark, current);
 
             if (!next) {
-                next = {
-                    name: null,
-                    nav: current,
-                    items: [],
-                    structure: "none",
-                    childreen: [],
-                };
-
-                mark.childreen.push(next);
+                next = nf(mark, current);
+                if(!next) {
+                    return null;
+                }
             }
 
             if (splits.length === 0) {
@@ -143,6 +219,8 @@ export interface ShopRegister {
     structure: string;
     items: ShopItem[];
     childreen: ShopRegister[];
+    structureConfig: StringMap<string | number>;
+    structureConfigValid: boolean;
 }
 
 export interface SerializableShopRegister extends ShopRegister, SerializeValue {}
@@ -154,4 +232,8 @@ export interface ShopItem {
 
 export enum BuyStatus {
     BUY_SUCCESS, INVALID_ITEM, MONEY_MISSING, ITEMS_OUT, UNIQUE_ITEM_BOUGHT_TWICE
+}
+
+export enum StructureConfigStatus {
+    SUCCESS, NO_PARAMETER, INVALID_TYPE
 }

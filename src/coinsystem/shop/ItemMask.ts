@@ -1,7 +1,8 @@
 import Account from "../Account";
 import CoinSystem from "../CoinSystem";
 import Transfer from "../Transfer";
-import { ShopItem, BuyStatus } from "./ShopSystem";
+import { BuyStatus } from "./ShopSystem";
+import {StringMap} from "../../Types";
 
 export default abstract class ItemMask {
     coinSystem: CoinSystem;
@@ -11,14 +12,21 @@ export default abstract class ItemMask {
     canEquip: boolean;
     canSell: boolean;
 
+    protected Config: StringMap<string | number>;
+
     constructor(coinSystem: CoinSystem) {
         this.coinSystem = coinSystem;
+        this.setConfig();
+    }
+
+    get config() {
+        return this.Config;
     }
 
     buy(buyer: Account, seller: Account, price: number, structureName: string) {
         if (!this.isStackable) {
             const structure = buyer.inventory.findItemStructure(this.name);
-            if(structure) {
+            if (structure) {
                 return BuyStatus.UNIQUE_ITEM_BOUGHT_TWICE;
             }
         }
@@ -33,10 +41,11 @@ export default abstract class ItemMask {
         return BuyStatus.BUY_SUCCESS;
     }
 
-    abstract onEquip(account: Account): boolean;
-    abstract onUnequip(account: Account): boolean;
-    abstract onBuy(account: Account): boolean;
-    abstract onSell(account: Account): boolean;
+    abstract equip(account: Account, config: StringMap<string | number>): boolean;
+    abstract unequip(account: Account, config: StringMap<string | number>): boolean;
+    abstract sell(account: Account, config: StringMap<string | number>): boolean;
+    abstract setConfig(): void;
+    abstract validConfig(structureConfig: StringMap<string | number>): boolean;
 }
 
 export interface InventoryItem {

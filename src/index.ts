@@ -19,6 +19,9 @@ import TransferCommand from "./discord/commands/TransferCommand";
 import Serializer from "./filesystem/Serializer";
 import AdUpvote, { AdChannelInformation } from "./discord/events/AdUpvote";
 import scheduler from "node-schedule";
+import AdminShopCommand from "./discord/commands/admin/AdminShopCommand";
+import { SerializableShopRegister } from "./coinsystem/shop/ShopSystem";
+import EquipableRoleMask from "./discord/components/EquipableRoleMask";
 
 dotenv.config();
 
@@ -60,6 +63,15 @@ const bot = new Bot({
         coinSystem.deserialize(coinSystemLinker.value["*"]);
     }
 
+    const shopSystemLinker = new JsonLinker<{ "*": SerializableShopRegister }>(dpData, "shopSystem.json");
+
+    if (shopSystemLinker.sourceVisible()) {
+        shopSystemLinker.load();
+        coinSystem.shopSystem.deserialize(shopSystemLinker.value["*"]);
+    }
+
+    coinSystem.shopSystem.addShopItemStructure("discord:equipable-role", new EquipableRoleMask(coinSystem, bot));
+
     const channelInformationLinker = new JsonLinker<StringMap<AdChannelInformation>>(
         dpConfig,
         "channelmarker_debug.json"
@@ -74,11 +86,11 @@ const bot = new Bot({
     bot.commandHandler.registerCommand(new CheckCommand(bot, "check", coinSystem));
     bot.commandHandler.registerCommand(new TestReaction(bot, "reaction", coinSystem));
     bot.commandHandler.registerCommand(new TransferCommand(bot, "transfer", coinSystem));
+    bot.commandHandler.registerCommand(new AdminShopCommand(bot, "sysshop", coinSystem));
 
     bot.commandHandler.assignDocumentations(documentations);
 
     bot.eventHandler.addEventListener("ready", ReadyEvent);
-    bot.eventHandler.addEventListener("message", WordManager(coinSystem));
     AdUpvote(channelInformationLinker, bot, coinSystem);
 
     InviteTracker(coinSystem, bot);
@@ -86,12 +98,18 @@ const bot = new Bot({
     process.stdin.resume();
     const closeHandler = () => {
         Serializer.writeObject(dpData.parse("coinSystem.json"), coinSystem);
+        Serializer.writeObject(dpData.parse("shopSystem.json"), coinSystem.shopSystem);
         process.exit(0);
     };
+
+    bot.eventHandler.addEventListener("message", WordManager(coinSystem));
 
     process.on("exit", closeHandler);
     process.on("SIGINT", closeHandler);
     process.on("SIGUSR1", closeHandler);
     process.on("SIGUSR2", closeHandler);
-    process.on("uncaughtException", closeHandler);
+    process.on("uncaughtException", (error) => {
+        console.error(error);
+        closeHandler();
+    });
 })();

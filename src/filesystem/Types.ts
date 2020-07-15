@@ -9,7 +9,7 @@ export interface KeySerializable<T> {
 }
 
 export interface SerializeValue {
-    [name: string]: object|string|number
+    [name: string]: object|string|number|boolean
 }
 
 export interface Serialized<T> {

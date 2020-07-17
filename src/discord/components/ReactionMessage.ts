@@ -5,6 +5,8 @@ export default class ReactionMessage {
     listener: Map<number, (user?: User, reactionType?: ReactionType) => any>;
     reactions: string[];
     reactionManager: ReactionManager;
+    onReactionsAdded: () => any;
+    onReactionsRemoved: () => any;
 
     private Message: Message;
 
@@ -31,6 +33,14 @@ export default class ReactionMessage {
         this.reactionManager.removeMessage(this.message.id);
     }
 
+    removeReactions() {
+        this.message.reactions.removeAll().then(() => {
+            if(this.onReactionsRemoved) {
+                this.onReactionsRemoved();
+            }
+        });
+    }
+
     call(reaction: ReactionEmoji | GuildEmoji, user: User, reactionType: ReactionType = ReactionType.CALL) {
         const index = this.reactions.indexOf(reaction.name);
         if (index !== -1) {
@@ -43,6 +53,10 @@ export default class ReactionMessage {
     private addReactions(count: number, reactions: string[]) {
         if (count < reactions.length) {
             this.Message.react(reactions[count]).then(() => this.addReactions.bind(this)(++count, reactions));
+        } else {
+            if(this.onReactionsAdded) {
+                this.onReactionsAdded();
+            }
         }
     }
 }

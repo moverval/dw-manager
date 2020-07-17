@@ -4,17 +4,10 @@ import { StringMap } from "../../Types";
 import ItemMask from "./ItemMask";
 import Account from "../Account";
 import lodash from "lodash";
-import EquipableRoleMask from "../../discord/components/EquipableRoleMask";
+import { v4 as uuidv4 } from "uuid";
+import Transfer from "../Transfer";
 
 export default class ShopSystem implements Serializable<SerializableShopRegister> {
-    static findItem<T>(list: ShopItem[], getter: (s: ShopItem) => T, value: T) {
-        return list.find((shopItem) => getter(shopItem) === value);
-    }
-
-    static findItems<T>(list: ShopItem[], getter: (s: ShopItem) => T, value: T) {
-        return list.filter((shopItem) => getter(shopItem) === value);
-    }
-
     static findNav(register: ShopRegister, key: string) {
         return register.childreen.find((shopReg) => shopReg.nav === key);
     }
@@ -31,14 +24,15 @@ export default class ShopSystem implements Serializable<SerializableShopRegister
         return shopItem.contributorId;
     }
 
-    static addItem(mark: ShopRegister, item: ShopItem) {
-        mark.items.push(item);
+    static addItem(mark: ShopRegister, account: Account, price: number) {
+        mark.items.push({ price, contributorId: account.userId, id: uuidv4() });
     }
 
-    static removeItem(mark: ShopRegister, item: ShopItem) {
-        const index = mark.items.indexOf(item);
-        if(index) {
-            mark.items.splice(index, 1);
+    static removeItem(mark: ShopRegister, itemId: string) {
+        const index = ShopSystem.findItemIndex(mark, itemId);
+
+        if(index !== -1) {
+            this.removeItemByIndex(mark, index);
             return true;
         } else {
             return false;
@@ -59,9 +53,9 @@ export default class ShopSystem implements Serializable<SerializableShopRegister
 
     static rename(mark: ShopRegister, nav: string, name: string) {
         const realElement = ShopSystem.findNav(mark, name);
-        if(!realElement) {
+        if (!realElement) {
             const oldElement = ShopSystem.findNav(mark, nav);
-            if(nav) {
+            if (nav) {
                 oldElement.nav = name.split(".")[0];
                 return true;
             }
@@ -74,11 +68,11 @@ export default class ShopSystem implements Serializable<SerializableShopRegister
         const type = typeof mark.structureConfig[point];
         const typeValue = typeof value;
 
-        if(type === "undefined") {
+        if (type === "undefined") {
             return StructureConfigStatus.NO_PARAMETER;
         }
 
-        if(type === typeValue) {
+        if (type === typeValue) {
             mark.structureConfig[point] = value;
             return StructureConfigStatus.SUCCESS;
         } else {
@@ -90,6 +84,14 @@ export default class ShopSystem implements Serializable<SerializableShopRegister
         return typeof mark.structureConfig[point];
     }
 
+    static findItemIndex(mark: ShopRegister, itemId: string) {
+        return mark.items.findIndex((item) => item.id === itemId);
+    }
+
+    static removeItemByIndex(mark: ShopRegister, index: number) {
+        mark.items.splice(index, 1);
+    }
+
     static point_create(mark: ShopRegister, current: string) {
         const next: ShopRegister = {
             name: null,
@@ -98,7 +100,8 @@ export default class ShopSystem implements Serializable<SerializableShopRegister
             structure: "none",
             childreen: [],
             structureConfig: {},
-            structureConfigValid: true
+            structureConfigValid: true,
+            description: null,
         };
 
         mark.childreen.push(next);
@@ -123,7 +126,8 @@ export default class ShopSystem implements Serializable<SerializableShopRegister
             structure: "none",
             childreen: [],
             structureConfig: {},
-            structureConfigValid: true
+            structureConfigValid: true,
+            description: null,
         };
         this.shopItemStructure = {};
     }
@@ -152,29 +156,32 @@ export default class ShopSystem implements Serializable<SerializableShopRegister
         return verified;
     }
 
-    buyItem(mark: ShopRegister, account: Account, sorter: (mark: ShopRegister) => ShopItem[]): BuyStatus {
-        if (mark.structure !== "none") {
-            const itemStructure = this.shopItemStructure[mark.structure];
-            if (itemStructure) {
-                const sortedArray = sorter(mark);
-                const selectedItem = sortedArray[0];
-                if(selectedItem) {
-                    const seller = this.coinSystem.getAccount(selectedItem.contributorId);
-                    const buyStatus = itemStructure.buy(account, seller, selectedItem.price, itemStructure.name);
-                    if(buyStatus === BuyStatus.BUY_SUCCESS) {
-                        const index = mark.items.indexOf(selectedItem);
-                        mark.items.splice(index, 1);
-                    }
+    buyItem(mark: ShopRegister, account: Account, itemId: string): BuyStatus {
+        if(this.isItemStructure(mark.structure)) {
+            const itemIndex = ShopSystem.findItemIndex(mark, itemId);
 
-                    return buyStatus;
+            if(itemIndex !== -1) {
+                const item = mark.items[itemIndex];
+
+                const seller = this.coinSystem.getAccount(item.contributorId);
+
+                const transfer = new Transfer(item.price);
+                this.coinSystem.registerTransfer(transfer);
+                const success = this.coinSystem.makeTransfer(transfer.id, account, seller);
+
+                if(success) {
+                    ShopSystem.removeItemByIndex(mark, itemIndex);
+                    account.inventory.addItem(mark.name, mark.structure, mark.structureConfig);
+
+                    return BuyStatus.SUCCESS;
                 } else {
-                    return BuyStatus.ITEMS_OUT;
+                    return BuyStatus.INVALID_TRANSACTION;
                 }
             } else {
-                return BuyStatus.INVALID_ITEM;
+                return BuyStatus.ITEM_ALREADY_SOLD;
             }
         } else {
-            return BuyStatus.INVALID_ITEM;
+            return BuyStatus.INVALID_CATEGORY;
         }
     }
 
@@ -197,7 +204,7 @@ export default class ShopSystem implements Serializable<SerializableShopRegister
 
             if (!next) {
                 next = nf(mark, current);
-                if(!next) {
+                if (!next) {
                     return null;
                 }
             }
@@ -221,6 +228,7 @@ export interface ShopRegister {
     childreen: ShopRegister[];
     structureConfig: StringMap<string | number>;
     structureConfigValid: boolean;
+    description: string;
 }
 
 export interface SerializableShopRegister extends ShopRegister, SerializeValue {}
@@ -228,12 +236,15 @@ export interface SerializableShopRegister extends ShopRegister, SerializeValue {
 export interface ShopItem {
     contributorId: string;
     price: number;
+    id: string;
 }
 
 export enum BuyStatus {
-    BUY_SUCCESS, INVALID_ITEM, MONEY_MISSING, ITEMS_OUT, UNIQUE_ITEM_BOUGHT_TWICE
+    SUCCESS, INVALID_CATEGORY, ITEM_ALREADY_SOLD, INVALID_TRANSACTION
 }
 
 export enum StructureConfigStatus {
-    SUCCESS, NO_PARAMETER, INVALID_TYPE
+    SUCCESS,
+    NO_PARAMETER,
+    INVALID_TYPE,
 }

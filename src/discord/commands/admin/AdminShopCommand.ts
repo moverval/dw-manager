@@ -3,6 +3,7 @@ import { Message, MessageEmbed } from "discord.js";
 import Bot from "../../Bot";
 import CoinSystem from "../../../coinsystem/CoinSystem";
 import ShopSystem, { ShopRegister, StructureConfigStatus } from "../../../coinsystem/shop/ShopSystem";
+import Account from "../../../coinsystem/Account";
 
 export default class AdminShopCommand extends Command {
     coinSystem: CoinSystem;
@@ -111,6 +112,71 @@ export default class AdminShopCommand extends Command {
                                 }
                             }
                             break;
+
+                        case "sd":
+                        case "set_description":
+                            {
+                                if (args.length >= 3) {
+                                    this.setDescription(message, args[1], args.slice(2).join(" "));
+                                }
+                            }
+                            break;
+
+                        case "ai":
+                        case "add_item":
+                            {
+                                if (args.length === 3) {
+                                    const num = Number(args[2]);
+
+                                    if (!isNaN(num)) {
+                                        this.addItem(message, args[1], num);
+                                    } else {
+                                        message.channel.send("Zweites Argument muss eine Nummer sein.");
+                                    }
+                                } else {
+                                    message.channel.send("AI Befehl benötigt zwei Argumente.");
+                                }
+                            }
+                            break;
+
+                        case "ais":
+                        case "add_items":
+                            {
+                                if (args.length === 4) {
+                                    const num1 = Number(args[2]);
+                                    const num2 = Number(args[3]);
+
+                                    if (!isNaN(num1) && !isNaN(num2)) {
+                                        this.addItems(message, args[1], num1, num2);
+                                    } else {
+                                        message.channel.send("Zweites und drittes Argument muss ein Nummer sein.");
+                                    }
+                                } else {
+                                    message.channel.send("AIS Befehl benötigt drei Argumente.");
+                                }
+                            }
+                            break;
+
+                        case "ri":
+                        case "remove_item":
+                            {
+                                if (args.length === 3) {
+                                    this.removeItem(message, args[1], args[2]);
+                                } else {
+                                    message.channel.send("RI Befehl benötigt zwei Argumente.");
+                                }
+                            }
+                            break;
+
+                        case "imls":
+                            {
+                                if (args.length === 2) {
+                                    this.listItems(message, args[1]);
+                                } else {
+                                    message.channel.send("IMLS benötigt ein Argument.");
+                                }
+                            }
+                            break;
                     }
                 }
             }
@@ -212,12 +278,16 @@ export default class AdminShopCommand extends Command {
                         "\n**Struktur:** " +
                         (sr.structure === null ? "<!Nicht gesetzt!>" : sr.structure) +
                         "\n**Navigation:** " +
-                        sr.nav
+                        sr.nav +
+                        "\n**Beschreibung:** " +
+                        (sr.description ? sr.description : "Nicht festgelegt")
                 )
                 .addField("Zusätzlich", "**Verkaufsangebote:** " + sr.items.length);
 
-            embed
-                .addField("Struktur Informationen", "Struktur muss konfiguriert werden: " + (sr.structureConfigValid ? "nein" : "**ja**"));
+            embed.addField(
+                "Struktur Informationen",
+                "Struktur muss konfiguriert werden: " + (sr.structureConfigValid ? "nein" : "**ja**")
+            );
 
             if (sr.childreen.length > 0) {
                 let subCategoryStr = "";
@@ -312,5 +382,79 @@ export default class AdminShopCommand extends Command {
 
         embed.setDescription(output);
         message.channel.send(embed);
+    }
+
+    setDescription(message: Message, category: string, text: string) {
+        const mark = this.coinSystem.shopSystem.point(category, ShopSystem.point_cancel);
+        if (!mark) {
+            message.channel.send("Kategorie nicht gefunden.");
+            return;
+        }
+
+        mark.description = text;
+        message.channel.send("Beschreibung wurde geändert.");
+    }
+
+    addItem(message: Message, category: string, price: number) {
+        const sr = this.coinSystem.shopSystem.point(category, ShopSystem.point_cancel);
+
+        if (sr) {
+            ShopSystem.addItem(sr, Account.rootAccount(this.coinSystem), price);
+            message.channel.send("Item wurde hinzugefügt.");
+        } else {
+            message.channel.send("Kategorie wurde nicht gefunden.");
+        }
+    }
+
+    addItems(message: Message, category: string, price: number, amount: number) {
+        const sr = this.coinSystem.shopSystem.point(category, ShopSystem.point_cancel);
+
+        if (sr) {
+            const rootAccount = Account.rootAccount(this.coinSystem);
+
+            for (let i = 0; i < amount; i++) {
+                ShopSystem.addItem(sr, rootAccount, price);
+            }
+            message.channel.send("Items wurden hinzugefügt.");
+        } else {
+            message.channel.send("Kategorie wurde nicht gefunden.");
+        }
+    }
+
+    removeItem(message: Message, category: string, id: string) {
+        const sr = this.coinSystem.shopSystem.point(category, ShopSystem.point_cancel);
+
+        if (sr) {
+            if (ShopSystem.removeItem(sr, id)) {
+                message.channel.send("Item wurde entfernt.");
+            } else {
+                message.channel.send("Item nicht gefunden.");
+            }
+        } else {
+            message.channel.send("Kategorie nicht gefunden.");
+        }
+    }
+
+    listItems(message: Message, category: string) {
+        const sr = this.coinSystem.shopSystem.point(category, ShopSystem.point_cancel);
+
+        if (sr) {
+            let text = "";
+
+            sr.items.forEach((item) => {
+                text += `ID: ${item.id}; Price: ${item.price}C; Contributor: ${item.contributorId}\n`;
+            });
+
+            const embed = new MessageEmbed();
+
+            if (text === "") {
+                text = "Keine Items gefunden.";
+            }
+
+            embed.setTitle("Items").setDescription(text);
+            message.channel.send(embed);
+        } else {
+            message.channel.send("Kategorie wurde nicht gefunden.");
+        }
     }
 }

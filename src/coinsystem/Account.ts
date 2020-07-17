@@ -2,7 +2,7 @@ import { AccountEarnType } from "./AccountEarnConfig";
 import CoinSystem from "./CoinSystem";
 import Transfer, { TransferPosition } from "./Transfer";
 import { Serializable } from "../filesystem/Types";
-import Inventory from "./shop/Inventory";
+import Inventory, {SerializableInventory} from "./shop/Inventory";
 
 export default class Account implements Serializable<AccountValue> {
     static rootAccount(coinSystem: CoinSystem) {
@@ -30,12 +30,14 @@ export default class Account implements Serializable<AccountValue> {
         return {
             userId: this.userId,
             coins: this.Coins,
+            inventory: this.inventory.serialize()
         };
     }
 
     deserialize(value: AccountValue) {
         this.userId = value.userId;
         this.Coins = value.coins;
+        this.inventory.deserialize(value.inventory);
 
         return true;
     }
@@ -66,4 +68,5 @@ export default class Account implements Serializable<AccountValue> {
 export interface AccountValue {
     userId: string;
     coins: number;
+    inventory: SerializableInventory;
 }

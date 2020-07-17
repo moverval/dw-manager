@@ -22,6 +22,7 @@ import scheduler from "node-schedule";
 import AdminShopCommand from "./discord/commands/admin/AdminShopCommand";
 import { SerializableShopRegister } from "./coinsystem/shop/ShopSystem";
 import EquipableRoleMask from "./discord/components/EquipableRoleMask";
+import ShopCommand from "./discord/commands/ShopCommand";
 
 dotenv.config();
 
@@ -87,6 +88,7 @@ const bot = new Bot({
     bot.commandHandler.registerCommand(new TestReaction(bot, "reaction", coinSystem));
     bot.commandHandler.registerCommand(new TransferCommand(bot, "transfer", coinSystem));
     bot.commandHandler.registerCommand(new AdminShopCommand(bot, "sysshop", coinSystem));
+    bot.commandHandler.registerCommand(new ShopCommand(bot, "shop", coinSystem));
 
     bot.commandHandler.assignDocumentations(documentations);
 

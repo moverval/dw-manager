@@ -1,71 +1,62 @@
-import ShopSystem, { ShopRegister, ShopItem } from "./ShopSystem";
 import Account from "../Account";
+import { StringMap } from "../../Types";
+import { v4 as uuidv4 } from "uuid";
+import { Serializable, SerializeValue } from "../../filesystem/Types";
+import ShopSystem from "./ShopSystem";
 
-export default class Inventory {
+export default class Inventory implements Serializable<SerializableInventory> {
     shopSystem: ShopSystem;
-    inventoryData: ShopRegister[];
+    inventoryMap: StringMap<InventoryItem>;
     account: Account;
 
     constructor(shopSystem: ShopSystem, account: Account) {
+        this.inventoryMap = {};
         this.shopSystem = shopSystem;
         this.account = account;
     }
 
-    findItemStructure(itemStructure: string) {
-        return this.inventoryData.find((iis) => iis.structure === itemStructure);
+    hasItem(id: string) {
+        return typeof this.inventoryMap[id] !== "undefined";
     }
 
-    hasItemStructure(itemStructure: string) {
-        return typeof this.findItemStructure(itemStructure) !== "undefined";
-    }
-
-    addItemStructure(itemStructure: string) {
-        const itemStructureObject: ShopRegister = {
-            name: null,
-            structure: itemStructure,
-            childreen: [],
-            items: [],
-            nav: null,
-            structureConfig: {},
-            structureConfigValid: true
-        };
-
-        this.inventoryData.push(itemStructureObject);
-
-        return itemStructureObject;
-    }
-
-    addToStructure(itemStructure: string, shopItem: ShopItem) {
-        const itemStructureObject = this.findItemStructure(itemStructure);
-        itemStructureObject.items.push(shopItem);
-    }
-
-    addItem(itemStructure: string) {
-        let itemStructureObject = this.findItemStructure(itemStructure);
-        if(!itemStructureObject) {
-            itemStructureObject = this.addItemStructure(itemStructure);
+    addItem(name: string, structure: string, structureConfig: StringMap<string | number>) {
+        if (this.shopSystem.isItemStructure(structure)) {
+            const id = uuidv4();
+            this.inventoryMap[id] = {
+                name,
+                structure,
+                config: structureConfig,
+            };
         }
-
-        const shopItem: ShopItem = {
-            contributorId: this.account.userId,
-            price: 0
-        };
-
-        itemStructureObject.items.push(shopItem);
     }
 
-    removeItem(itemStructure: string) {
-        const itemStructureObject = this.findItemStructure(itemStructure);
-
-        if(itemStructureObject) {
-            if(itemStructureObject.items.length > 0) {
-                itemStructureObject.items.shift();
-                return true;
-            } else {
-                return false;
-            }
+    removeItem(id: string) {
+        if (this.hasItem(id)) {
+            this.inventoryMap[id] = undefined;
+            return true;
         } else {
             return false;
         }
     }
+
+    serialize() {
+        return {
+            items: this.inventoryMap,
+        };
+    }
+
+    deserialize(invObj: SerializableInventory) {
+        this.inventoryMap = invObj.items;
+        return true;
+    }
+}
+
+export interface InventoryItem {
+    name: string;
+    structure: string;
+    config: StringMap<string | number>;
+}
+
+export interface SerializableInventory extends SerializeValue {
+    items: StringMap<InventoryItem>;
 }

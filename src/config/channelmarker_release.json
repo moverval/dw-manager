@@ -1,5 +1,22 @@
 {
     "466225455968681985": {
-        "community": true
+        "community": true,
+        "ad": false
+    },
+    "620258609242177557": {
+        "community": false,
+        "ad": true
+    },
+    "611865355211505674": {
+        "community": false,
+        "ad": true
+    },
+    "611865470064394240": {
+        "community": false,
+        "ad": true
+    },
+    "611883018839392256": {
+        "community": false,
+        "ad": true
     }
 }

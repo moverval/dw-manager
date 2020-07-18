@@ -22,6 +22,7 @@ import { SerializableShopRegister } from "./coinsystem/shop/ShopSystem";
 import EquipableRoleMask from "./discord/components/EquipableRoleMask";
 import ShopCommand from "./discord/commands/ShopCommand";
 import fs from "fs";
+import BumpEvent from "./discord/events/BumpEvent";
 
 dotenv.config();
 
@@ -82,7 +83,7 @@ const bot = new Bot({
 
     bot.commandHandler.registerCommand(new PingCommand(bot, "ping"));
     bot.commandHandler.registerCommand(new HelpCommand(bot, "help"));
-    bot.commandHandler.registerCommand(new CoinCommand(bot, "coins", coinSystem));
+    bot.commandHandler.registerCommand(new CoinCommand(bot, "money", coinSystem));
     bot.commandHandler.registerCommand(new TransferCommand(bot, "transfer", coinSystem));
     bot.commandHandler.registerCommand(new AdminShopCommand(bot, "sysshop", coinSystem));
     bot.commandHandler.registerCommand(new ShopCommand(bot, "shop", coinSystem));
@@ -111,6 +112,7 @@ const bot = new Bot({
     };
 
     bot.eventHandler.addEventListener("message", WordManager(coinSystem, channelInformationLinker));
+    bot.eventHandler.addEventListener("message", BumpEvent(coinSystem));
 
     process.on("exit", closeHandler);
     process.on("SIGINT", closeHandler);

@@ -24,7 +24,10 @@ export default class CoinCommand extends Command {
             if(message.mentions.users.array().length === 1) {
                 user = message.mentions.users.array()[0];
             } else if(args.length === 1) {
-                user = message.guild.members.cache.get(args[0]).user;
+                const member = message.guild.members.cache.get(args[0]);
+                if(member) {
+                    user = member.user;
+                }
             }
 
             if(user) {

@@ -48,5 +48,17 @@
         "nav": "null",
         "description": "#file: ./markdown/help/transferCommand.md",
         "childreen": []
+    },
+    "shop": {
+        "title": "Shop",
+        "nav": "null",
+        "description": "#file: ./markdown/help/shopCommand.md",
+        "childreen": []
+    },
+    "money": {
+        "title": "Money",
+        "nav": "null",
+        "description": "#file: ./markdown/help/moneyCommand.md",
+        "childreen": []
     }
 }

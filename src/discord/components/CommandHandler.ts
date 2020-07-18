@@ -8,7 +8,8 @@ export default class CommandHandler {
     private static makeMessageListener(prefix: string, commands: CommandMap) {
         CommandHandler.makeMessageListener.prototype.cmdNf = new MessageEmbed()
             .setTitle("Befehl existiert nicht")
-            .setDescription("Nutze Help um alle ferfügbaren Befehle einzusehen.");
+            .setDescription("Nutze `++help` um alle verfügbaren Befehle einzusehen.");
+
         return (message: Message) => {
             if (message.content.startsWith(prefix) && !message.member.user.bot) {
                 const args = message.content.split(" ");
@@ -17,19 +18,23 @@ export default class CommandHandler {
                     const value = commands[invoke].run(message, args);
 
                     switch (value) {
-                        case ReturnValue.WRONG_NOTATION: {
-                            const embed = new MessageEmbed();
-                            embed
-                                .setTitle("Falsche Schreibweise")
-                                .setDescription(
-                                    `Nutze \`\`${prefix}help ${commands[invoke].invoke}\`\` um Hilfe für den Befehl zu erhalten`
-                                );
-                            message.channel.send(embed);
-                        }
+                        case ReturnValue.WRONG_NOTATION:
+                            {
+                                const embed = new MessageEmbed();
+                                embed
+                                    .setTitle("Falsche Schreibweise")
+                                    .setDescription(
+                                        `Nutze \`\`${prefix}help ${commands[invoke].invoke}\`\` um Hilfe für den Befehl zu erhalten`
+                                    );
+                                message.channel.send(embed);
+                            }
+                            break;
 
-                        case ReturnValue.INVALID_COMMAND: {
-                            message.channel.send(CommandHandler.makeMessageListener.prototype.cmdNf);
-                        }
+                        case ReturnValue.INVALID_COMMAND:
+                            {
+                                message.channel.send(CommandHandler.makeMessageListener.prototype.cmdNf);
+                            }
+                            break;
                     }
                 } else {
                     message.channel.send(CommandHandler.makeMessageListener.prototype.cmdNf);

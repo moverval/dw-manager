@@ -84,8 +84,6 @@ const bot = new Bot({
     bot.commandHandler.registerCommand(new PingCommand(bot, "ping"));
     bot.commandHandler.registerCommand(new HelpCommand(bot, "help"));
     bot.commandHandler.registerCommand(new CoinCommand(bot, "coins", coinSystem));
-    bot.commandHandler.registerCommand(new CheckCommand(bot, "check", coinSystem));
-    bot.commandHandler.registerCommand(new TestReaction(bot, "reaction", coinSystem));
     bot.commandHandler.registerCommand(new TransferCommand(bot, "transfer", coinSystem));
     bot.commandHandler.registerCommand(new AdminShopCommand(bot, "sysshop", coinSystem));
     bot.commandHandler.registerCommand(new ShopCommand(bot, "shop", coinSystem));

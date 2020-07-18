@@ -1,4 +1,3 @@
-import { BotAction } from "../Types";
 import { Message } from "discord.js";
 import DocumentationObject, { ParentObject } from "./DocumentationObject";
 import Bot from "../Bot";
@@ -18,7 +17,7 @@ export default abstract class Command {
     constructor(bot: Bot, invoke: string, visible?: boolean) {
         this.bot = bot;
         this.invoke = invoke;
-        if (visible) {
+        if (typeof visible !== "undefined") {
             this.visible = visible;
         } else {
             this.visible = true;

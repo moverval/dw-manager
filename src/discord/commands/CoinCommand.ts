@@ -1,5 +1,5 @@
 import Command, { ReturnValue } from "../abstract/Command";
-import { Message, MessageEmbed } from "discord.js";
+import { Message, MessageEmbed, User } from "discord.js";
 import Bot from "../Bot";
 import CoinSystem from "../../coinsystem/CoinSystem";
 
@@ -12,10 +12,34 @@ export default class CoinCommand extends Command {
     }
 
     run(message: Message, args: string[]): ReturnValue {
-        const account = this.coinSystem.getAccount(message.author.id);
-        const embed = new MessageEmbed();
-        embed.setTitle("Coins").setDescription("Du besitzt zurzeit **" + account.coins + "** Münzen.");
-        message.channel.send(embed);
+        if(args.length === 0) {
+            const account = this.coinSystem.getAccount(message.author.id);
+            const embed = new MessageEmbed();
+            embed.setTitle("Coins").setDescription("Du besitzt zurzeit **" + account.coins + "** Münzen.");
+            message.channel.send(embed);
+        } else {
+            const embed = new MessageEmbed();
+            let user: User;
+
+            if(message.mentions.users.array().length === 1) {
+                user = message.mentions.users.array()[0];
+            } else if(args.length === 1) {
+                user = message.guild.members.cache.get(args[0]).user;
+            }
+
+            if(user) {
+                if(this.coinSystem.isAccount(user.id)) {
+                    const account = this.coinSystem.getAccount(user.id);
+                    embed.setTitle("Coins: " + user.username).setDescription(`${user.username} besitzt zurzeit **${account.coins}** Münzen.`);
+                } else {
+                    embed.setTitle("Fehler").setDescription("Keinen Account gefunden");
+                }
+            } else {
+                embed.setTitle("Fehler").setDescription("Nutzer nicht gefunden.");
+            }
+
+            message.channel.send(embed);
+        }
 
         return ReturnValue.SUCCESS;
     }

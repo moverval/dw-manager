@@ -5,8 +5,7 @@ import { Message, MessageEmbed } from "discord.js";
 export default class HelpCommand extends Command {
     run(message: Message, args: string[]): ReturnValue {
         if (args.length === 0) {
-            const embed = new MessageEmbed();
-            embed
+            const embed = new MessageEmbed()
                 .setTitle("Übersicht")
                 .setDescription(
                     "Dies ist die Übersicht aller Befehle. Nutze \n``" +
@@ -15,24 +14,43 @@ export default class HelpCommand extends Command {
                         " " +
                         "<befehl>``\n Um Hilfe zu einem Befehl anzuzeigen."
                 );
+
             for (const commandName in this.bot.commandHandler.commands) {
                 if (this.bot.commandHandler.commands[commandName]) {
                     const command = this.bot.commandHandler.commands[commandName];
 
-                    embed.addField(
-                        command.invoke,
-                        "```" + this.bot.commandHandler.prefix + this.invoke + " " + command.invoke + "```"
-                    );
+                    if (command.visible) {
+                        embed.addField(
+                            command.invoke,
+                            "```" + this.bot.commandHandler.prefix + this.invoke + " " + command.invoke + "```"
+                        );
+                    }
                 }
             }
 
             message.channel.send(embed);
         } else if (args.length === 1) {
             const path = args[0].split(".");
+            let adminPermissions = false;
 
             if (this.bot.commandHandler.isCommand(path[0])) {
+                if (message.guild && message.guild.id === process.env.MAIN_GUILD) {
+                    if (message.member.permissions.has("ADMINISTRATOR")) {
+                        adminPermissions = true;
+                    }
+                }
+
                 const command = this.bot.commandHandler.commands[path.shift()];
                 const documentationObject = this.getDocumentationObject(path, command.documentation);
+
+                if (!command.visible && !adminPermissions) {
+                    message.channel.send(
+                        new MessageEmbed()
+                            .setTitle("Zugriff auf Befehl verweigert")
+                            .setDescription("Nutze `++help` um alle verfügbaren Befehle zu sehen.")
+                    );
+                    return ReturnValue.SUCCESS;
+                }
 
                 if (documentationObject) {
                     const embed = new MessageEmbed();

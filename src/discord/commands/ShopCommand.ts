@@ -208,6 +208,11 @@ export default class ShopCommand extends Command {
             }
         });
 
+        reactionMessage.setReactionListener(3, (user) => {
+            reactionMessage.clearListeners();
+            this.displayHomeWindow(message, interactiveMessage, embed);
+        });
+
         if (item) {
             this.makeBuyDetails(embed, item);
             this.drawMessage(this.makeBuyText(buyWindow), interactiveMessage, embed);
@@ -444,14 +449,17 @@ export default class ShopCommand extends Command {
 
             reactionMessage.setReactionListener(2, (user) => {
                 if (user.id === message.author.id) {
-                    reactionMessage.clearListeners();
-                    embed.fields = [];
-                    this.displayInventoryOptionWindow(
-                        account.inventory.inventoryMap[keys[inventoryWindow.selection]],
-                        message,
-                        interactiveMessage,
-                        embed
-                    );
+                    if(typeof account.inventory.inventoryMap[keys[inventoryWindow.selection]] !== "undefined") {
+                        reactionMessage.clearListeners();
+                        embed.fields = [];
+
+                        this.displayInventoryOptionWindow(
+                            account.inventory.inventoryMap[keys[inventoryWindow.selection]],
+                            message,
+                            interactiveMessage,
+                            embed
+                        );
+                    }
                 }
             });
         } else {

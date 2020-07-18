@@ -1,8 +1,7 @@
 import Account from "../Account";
 import { StringMap } from "../../Types";
-import { v4 as uuidv4 } from "uuid";
 import { Serializable, SerializeValue } from "../../filesystem/Types";
-import ShopSystem from "./ShopSystem";
+import ShopSystem, {ShopRegister} from "./ShopSystem";
 
 export default class Inventory implements Serializable<SerializableInventory> {
     shopSystem: ShopSystem;
@@ -19,13 +18,14 @@ export default class Inventory implements Serializable<SerializableInventory> {
         return typeof this.inventoryMap[id] !== "undefined";
     }
 
-    addItem(name: string, structure: string, structureConfig: StringMap<string | number>) {
+    addItem(name: string, structure: string, structureConfig: StringMap<string | number>, id: string) {
         if (this.shopSystem.isItemStructure(structure)) {
-            const id = uuidv4();
             this.inventoryMap[id] = {
+                id,
                 name,
                 structure,
                 config: structureConfig,
+                status: {}
             };
         }
     }
@@ -37,6 +37,49 @@ export default class Inventory implements Serializable<SerializableInventory> {
         } else {
             return false;
         }
+    }
+
+    makeOffer(item: InventoryItem, price: number) {
+        if(item.status.tradeOffer) {
+            return false;
+        }
+
+        const matchingCategories = this.shopSystem.findItemCategories(this.shopSystem.shopRegister, item.structure, item.config);
+
+        if(matchingCategories.length > 0) {
+            ShopSystem.addItem(matchingCategories[0], this.account, price, item.id);
+            item.status.tradeOffer = true;
+            return true;
+        }
+
+        return false;
+    }
+
+    removeOffer(item: InventoryItem) {
+        if(!item.status.tradeOffer) {
+            return false;
+        }
+
+        const matchingCategories = this.shopSystem.findItemCategories(this.shopSystem.shopRegister, item.structure, item.config);
+
+        let success = false;
+
+        matchingCategories.forEach((category) => {
+            const index = ShopSystem.findItemIndex(category, item.id);
+
+            if(index > -1) {
+                ShopSystem.removeItemByIndex(category, index);
+                item.status.tradeOffer = undefined;
+                success = true;
+                return;
+            }
+        });
+
+        return success;
+    }
+
+    isEmpty() {
+        return JSON.stringify(this.inventoryMap) === "{}";
     }
 
     serialize() {
@@ -52,9 +95,13 @@ export default class Inventory implements Serializable<SerializableInventory> {
 }
 
 export interface InventoryItem {
+    id: string;
     name: string;
     structure: string;
     config: StringMap<string | number>;
+    status: {
+        tradeOffer?: boolean;
+    }
 }
 
 export interface SerializableInventory extends SerializeValue {

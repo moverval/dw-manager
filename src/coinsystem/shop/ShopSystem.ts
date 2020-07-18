@@ -24,8 +24,8 @@ export default class ShopSystem implements Serializable<SerializableShopRegister
         return shopItem.contributorId;
     }
 
-    static addItem(mark: ShopRegister, account: Account, price: number) {
-        mark.items.push({ price, contributorId: account.userId, id: uuidv4() });
+    static addItem(mark: ShopRegister, account: Account, price: number, id?: string) {
+        mark.items.push({ price, contributorId: account.userId, id: (id ? id : uuidv4()) });
     }
 
     static removeItem(mark: ShopRegister, itemId: string) {
@@ -140,8 +140,8 @@ export default class ShopSystem implements Serializable<SerializableShopRegister
         return typeof this.shopItemStructure[name] !== "undefined";
     }
 
-    getStructure(mark: ShopRegister) {
-        return this.shopItemStructure[mark.structure];
+    getStructure(structure: string) {
+        return this.shopItemStructure[structure];
     }
 
     makeMarkStructure(mark: ShopRegister) {
@@ -171,7 +171,14 @@ export default class ShopSystem implements Serializable<SerializableShopRegister
 
                 if(success) {
                     ShopSystem.removeItemByIndex(mark, itemIndex);
-                    account.inventory.addItem(mark.name, mark.structure, mark.structureConfig);
+                    if(item.contributorId !== "*") {
+                        if(!seller.inventory.removeItem(item.id)) {
+                            this.coinSystem.makeTransfer(transfer.id, seller, account);
+                            return BuyStatus.ITEM_ALREADY_SOLD;
+                        }
+                    }
+                    account.inventory.addItem(mark.name, mark.structure, mark.structureConfig, item.id);
+                    this.coinSystem.removeTransfer(transfer.id);
 
                     return BuyStatus.SUCCESS;
                 } else {
@@ -192,6 +199,22 @@ export default class ShopSystem implements Serializable<SerializableShopRegister
     deserialize(s: SerializableShopRegister) {
         this.shopRegister = s as ShopRegister;
         return true;
+    }
+
+    findItemCategories(mark: ShopRegister, structure: string, structureConfig: StringMap<string | number>) {
+        const itemCategories: ShopRegister[] = [];
+
+        mark.childreen.forEach((sr) => {
+            itemCategories.push(...this.findItemCategories(sr, structure, structureConfig));
+
+            if(sr.childreen.length === 0) {
+                if(sr.structure === structure && JSON.stringify(structureConfig) === JSON.stringify(sr.structureConfig)) {
+                    itemCategories.push(sr);
+                }
+            }
+        });
+
+        return itemCategories;
     }
 
     point(navigation: string, nf: (m: ShopRegister, s: string) => ShopRegister) {

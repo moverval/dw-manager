@@ -41,6 +41,10 @@ export default class ReactionMessage {
         });
     }
 
+    clearListeners() {
+        this.listener = new Map();
+    }
+
     call(reaction: ReactionEmoji | GuildEmoji, user: User, reactionType: ReactionType = ReactionType.CALL) {
         const index = this.reactions.indexOf(reaction.name);
         if (index !== -1) {

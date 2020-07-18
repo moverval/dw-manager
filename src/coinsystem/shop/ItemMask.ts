@@ -6,9 +6,6 @@ export default abstract class ItemMask {
     coinSystem: CoinSystem;
 
     name: string;
-    isStackable: boolean;
-    canEquip: boolean;
-    canSell: boolean;
 
     protected Config: StringMap<string | number>;
 
@@ -21,8 +18,14 @@ export default abstract class ItemMask {
         return this.Config;
     }
 
+    equalConfig(config1: StringMap<string | number>, config2: StringMap<string | number>) {
+        return config1 === config2;
+    }
+
     abstract equip(account: Account, config: StringMap<string | number>): boolean;
     abstract unequip(account: Account, config: StringMap<string | number>): boolean;
+    abstract isEquipable(account: Account, config: StringMap<string | number>): boolean;
+    abstract isEquipped(account: Account, config: StringMap<string | number>): boolean;
     abstract setConfig(): void;
     abstract validConfig(structureConfig: StringMap<string | number>): boolean;
 }

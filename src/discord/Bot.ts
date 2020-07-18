@@ -4,6 +4,7 @@ import EventHandler from "./components/EventHandler";
 import CommandHandler from "./components/CommandHandler";
 import BotTools from "./components/BotTools";
 import ReactionManager from "./components/ReactionManager";
+import UserInputManager from "./components/UserInputManager";
 
 export interface BotInitializerList {
     token: string;
@@ -11,6 +12,7 @@ export interface BotInitializerList {
     noEventHandler?: boolean;
     noCommandHandler?: boolean;
     noReactionManager?: boolean;
+    noUserInputManager?: boolean;
     noUtil?: boolean;
 }
 
@@ -22,6 +24,7 @@ export default class Bot {
     eventHandler: EventHandler;
     commandHandler: CommandHandler;
     reactionManager: ReactionManager;
+    userInputManager: UserInputManager;
     util: BotTools;
 
     constructor(options: BotInitializerList) {
@@ -39,6 +42,10 @@ export default class Bot {
 
             if(!options.noReactionManager) {
                 this.reactionManager = new ReactionManager(this.eventHandler);
+            }
+
+            if(!options.noUserInputManager) {
+                this.userInputManager = new UserInputManager(this);
             }
         }
 

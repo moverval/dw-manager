@@ -12,17 +12,16 @@ import CoinSystem, { CoinSystemSerialized } from "./coinsystem/CoinSystem";
 import AccountEarnConfig from "./coinsystem/AccountEarnConfig";
 import CoinCommand from "./discord/commands/CoinCommand";
 import WordManager from "./discord/events/WordManager";
-import CheckCommand from "./discord/commands/admin/CheckCommand";
 import InviteTracker from "./discord/events/InviteTracker";
-import TestReaction from "./discord/commands/TestReaction";
 import TransferCommand from "./discord/commands/TransferCommand";
 import Serializer from "./filesystem/Serializer";
-import AdUpvote, { AdChannelInformation } from "./discord/events/AdUpvote";
+import AdUpvote, { ChannelInformation } from "./discord/events/AdUpvote";
 import scheduler from "node-schedule";
 import AdminShopCommand from "./discord/commands/admin/AdminShopCommand";
 import { SerializableShopRegister } from "./coinsystem/shop/ShopSystem";
 import EquipableRoleMask from "./discord/components/EquipableRoleMask";
 import ShopCommand from "./discord/commands/ShopCommand";
+import fs from "fs";
 
 dotenv.config();
 
@@ -73,7 +72,7 @@ const bot = new Bot({
 
     coinSystem.shopSystem.addShopItemStructure("discord:equipable-role", new EquipableRoleMask(coinSystem, bot));
 
-    const channelInformationLinker = new JsonLinker<StringMap<AdChannelInformation>>(
+    const channelInformationLinker = new JsonLinker<StringMap<ChannelInformation>>(
         dpConfig,
         "channelmarker_debug.json"
     );
@@ -95,6 +94,15 @@ const bot = new Bot({
 
     InviteTracker(coinSystem, bot);
 
+    scheduler.scheduleJob({ hour: 0, minute: 0 }, () => {
+        if(!fs.existsSync("backup")) {
+            fs.mkdirSync(dpData.parse("backup"));
+        }
+
+        Serializer.writeObject(dpData.parse("backup/coinSystem-" + new Date().toString() + ".json"), coinSystem);
+        Serializer.writeObject(dpData.parse("backup/shopSystem-" + new Date().toString() + ".json"), coinSystem.shopSystem);
+    });
+
     process.stdin.resume();
     const closeHandler = () => {
         Serializer.writeObject(dpData.parse("coinSystem.json"), coinSystem);
@@ -102,7 +110,7 @@ const bot = new Bot({
         process.exit(0);
     };
 
-    bot.eventHandler.addEventListener("message", WordManager(coinSystem));
+    bot.eventHandler.addEventListener("message", WordManager(coinSystem, channelInformationLinker));
 
     process.on("exit", closeHandler);
     process.on("SIGINT", closeHandler);

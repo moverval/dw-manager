@@ -1,4 +1,4 @@
-import { Message, User } from "discord.js";
+import { Message } from "discord.js";
 import JsonLinker from "../loaders/JsonLinker";
 import { StringMap } from "../../Types";
 import ReactionManager, { ReactionHandle } from "../components/ReactionManager";
@@ -9,7 +9,7 @@ import { AccountEarnType } from "../../coinsystem/AccountEarnConfig";
 import schedule from "node-schedule";
 
 export default function AdUpvote(
-    channelInformationLinker: JsonLinker<StringMap<AdChannelInformation>>,
+    channelInformationLinker: JsonLinker<StringMap<ChannelInformation>>,
     bot: Bot,
     coinSystem: CoinSystem
 ) {
@@ -21,6 +21,7 @@ export default function AdUpvote(
     schedule.scheduleJob({ hour: 0, minute: 0 }, () => {
         voteMap = {};
         voteReversedMap = {};
+        reactionManager.clearMessages();
     });
 
     bot.eventHandler.addEventListener("message", (message: Message) => {
@@ -78,7 +79,7 @@ export default function AdUpvote(
     });
 }
 
-export interface AdChannelInformation {
+export interface ChannelInformation {
     ad: boolean;
     community: boolean;
 }

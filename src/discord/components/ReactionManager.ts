@@ -22,6 +22,10 @@ export default class ReactionManager {
         return this.Messages;
     }
 
+    clearMessages() {
+        this.Messages = {};
+    }
+
     createMessage(message: Message, ...reaction: string[]) {
         const reactionMessage = new ReactionMessage(message, this, ...reaction);
         this.Messages[reactionMessage.message.id] = reactionMessage;

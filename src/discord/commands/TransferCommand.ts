@@ -25,7 +25,7 @@ export default class TransferCommand extends Command {
             if (receiver) {
                 const amount = Number(args[0]);
 
-                if (!isNaN(amount)) {
+                if (!isNaN(amount) && amount > 0 && amount <= 1000000000) {
                     const accountSender = this.coinSystem.getAccount(message.author.id);
                     const accountReceiver = this.coinSystem.getAccount(receiver.id);
 

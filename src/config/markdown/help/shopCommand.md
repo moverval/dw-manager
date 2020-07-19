@@ -15,7 +15,7 @@ Dies ist jedoch nicht die einzelne Aktivität. Hier ist eine ausführliche Liste
 
 - Einladen eines neuen Nutzers: 4000C
 - Hilfe für eine Person bieten: 300C
-- Wort schreiben: 3C
+- Wort schreiben: 4C
 - Server bumpen (Jede 2 Stunden 2 Mal): 150C
-- Gute Werbung upvoten: 75C
+- Gute Werbung upvoten (bis zu 10 Mal am Tag): 75C
 - Gute Werbung schreiben (Wird von Admin kontrolliert): 400C

@@ -11,6 +11,9 @@ export default function WordManager(
     channelInformationLinker: JsonLinker<StringMap<ChannelInformation>>
 ) {
     return (message: Message) => {
+        if(message.channel.type === "dm" || message.guild.id !== process.env.MAIN_GUILD) {
+            return;
+        }
         const channelInformation = channelInformationLinker.value[message.channel.id];
 
         if (channelInformation && channelInformation.community) {

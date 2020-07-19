@@ -25,6 +25,10 @@ export default function AdUpvote(
     });
 
     bot.eventHandler.addEventListener("message", (message: Message) => {
+        if(message.channel.type === "dm") {
+            return;
+        }
+
         const channelInformation = channelInformationLinker.value[message.channel.id];
 
         if (channelInformation) {

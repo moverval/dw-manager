@@ -7,6 +7,10 @@ export default function BumpEvent(coinSystem: CoinSystem) {
     let bump2Possible = true;
 
     return (message: Message) => {
+        if(message.channel.type === "dm") {
+            return;
+        }
+
         if(message.guild.id === process.env.MAIN_GUILD) {
             const account = coinSystem.getAccount(message.author.id);
 

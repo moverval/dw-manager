@@ -11,6 +11,13 @@ export default class CommandHandler {
             .setDescription("Nutze `++help` um alle verfügbaren Befehle einzusehen.");
 
         return (message: Message) => {
+            if(message.channel.type === "dm")  {
+                return;
+            }
+            if(message.guild.id !== process.env.MAIN_GUILD) {
+                return;
+            }
+
             if (message.content.startsWith(prefix) && !message.member.user.bot) {
                 const args = message.content.split(" ");
                 const invoke = args.shift().slice(prefix.length);

@@ -20,7 +20,7 @@ export default function WordManager(
             const account = cs.getAccount(message.author.id);
             const splits = message.content.split(" ");
             const real = splits.filter((split) => split.length > 3);
-            account.add(AccountEarnType.WORD_SENT, real.length);
+            account.add(AccountEarnType.WORD_SENT, real.length > 7 ? 7 : real.length);
         }
     };
 }

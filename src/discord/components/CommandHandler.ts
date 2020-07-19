@@ -14,7 +14,7 @@ export default class CommandHandler {
             if(message.channel.type === "dm")  {
                 return;
             }
-            if(message.guild.id !== process.env.MAIN_GUILD) {
+            if(!message.guild || message.guild.id !== process.env.MAIN_GUILD) {
                 return;
             }
 

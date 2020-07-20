@@ -24,6 +24,7 @@ import ShopCommand from "./discord/commands/ShopCommand";
 import fs from "fs";
 import BumpEvent from "./discord/events/BumpEvent";
 import CheckCommand from "./discord/commands/admin/CheckCommand";
+import LeaderboardCommand from "./discord/commands/LeaderboardCommand";
 
 dotenv.config();
 
@@ -89,6 +90,7 @@ const bot = new Bot({
     bot.commandHandler.registerCommand(new AdminShopCommand(bot, "sysshop", coinSystem));
     bot.commandHandler.registerCommand(new ShopCommand(bot, "shop", coinSystem));
     bot.commandHandler.registerCommand(new CheckCommand(bot, "check", coinSystem));
+    bot.commandHandler.registerCommand(new LeaderboardCommand(bot, "leaderboard", coinSystem));
 
     bot.commandHandler.assignDocumentations(documentations);
 

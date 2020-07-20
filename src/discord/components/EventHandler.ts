@@ -35,7 +35,11 @@ export default class EventHandler {
 
     private call<K extends keyof ClientEvents>(key: K, ...args: ClientEvents[K]) {
         this.events[key].forEach((obj) => {
-            obj.listener(...args);
+            try {
+                obj.listener(...args);
+            } catch(Error) {
+                console.error(Error);
+            }
         });
     }
 

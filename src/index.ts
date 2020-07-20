@@ -23,6 +23,7 @@ import EquipableRoleMask from "./discord/components/EquipableRoleMask";
 import ShopCommand from "./discord/commands/ShopCommand";
 import fs from "fs";
 import BumpEvent from "./discord/events/BumpEvent";
+import CheckCommand from "./discord/commands/admin/CheckCommand";
 
 dotenv.config();
 
@@ -87,6 +88,7 @@ const bot = new Bot({
     bot.commandHandler.registerCommand(new TransferCommand(bot, "transfer", coinSystem));
     bot.commandHandler.registerCommand(new AdminShopCommand(bot, "sysshop", coinSystem));
     bot.commandHandler.registerCommand(new ShopCommand(bot, "shop", coinSystem));
+    bot.commandHandler.registerCommand(new CheckCommand(bot, "check", coinSystem));
 
     bot.commandHandler.assignDocumentations(documentations);
 

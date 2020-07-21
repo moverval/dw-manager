@@ -100,7 +100,7 @@ const bot = new Bot({
     InviteTracker(coinSystem, bot);
 
     scheduler.scheduleJob({ hour: 0, minute: 0 }, () => {
-        if(!fs.existsSync("backup")) {
+        if(!fs.existsSync(dpData.parse("backup"))) {
             fs.mkdirSync(dpData.parse("backup"));
         }
 

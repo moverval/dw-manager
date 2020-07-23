@@ -19,28 +19,31 @@ export default class LeaderboardCommand extends Command {
             (key1, key2) => this.coinSystem.accounts[key2].coins - this.coinSystem.accounts[key1].coins
         );
         let site = 0;
-        if(args.length === 1) {
+        if (args.length === 1) {
             const num = Number(args[0]);
-            if(!isNaN(num) && num - 1 > 0) {
+            if (!isNaN(num) && num - 1 > 0) {
                 site = num - 1;
             }
         }
-        if(sortedAccountKeys.length - 1 >= site * this.siteSize) {
+        if (sortedAccountKeys.length - 1 >= site * this.siteSize) {
             let text = "";
             const nEnd = site * this.siteSize + this.siteSize;
             const end = nEnd > sortedAccountKeys.length ? sortedAccountKeys.length : nEnd;
 
-            for(let i = site * this.siteSize; i < end; i++) {
+            for (let i = site * this.siteSize; i < end; i++) {
                 const account = this.coinSystem.accounts[sortedAccountKeys[i]];
                 const user = guild.members.cache.get(account.userId);
-                text += `**${user ? user.user.username : "Unbekannt"}**: ${account.coins}\n`;
+                text += `${i + 1}. **${user ? user.user.username : "Unbekannt"}**: ${account.coins}\n`;
             }
 
-            if(text === "") {
+            if (text === "") {
                 text = "Keine Accounts vorhanden.";
             }
 
-            embed.setDescription(text).setTitle("Leaderboard").setFooter(`Seite ${site + 1}/${Math.ceil((sortedAccountKeys.length - 1) / this.siteSize)}`);
+            embed
+                .setDescription(text)
+                .setTitle("Leaderboard")
+                .setFooter(`Seite ${site + 1}/${Math.ceil((sortedAccountKeys.length - 1) / this.siteSize)}`);
             message.channel.send(embed);
         } else {
             message.channel.send("Diese Seite existiert nicht.");

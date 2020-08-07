@@ -420,10 +420,16 @@ export default class ShopCommand extends Command {
         const reactionMessage = this.getReactionMessage(interactiveMessage);
         const account = this.coinSystem.getAccount(message.author.id);
         const keys = Object.keys(account.inventory.inventoryMap);
-        const selections = keys.map((itemName) => account.inventory.inventoryMap[itemName].name);
+        const selections = keys
+            .filter((key) => account.inventory.inventoryMap[key] !== undefined)
+            .map((itemName) =>
+                account.inventory.inventoryMap[itemName].name
+                    ? account.inventory.inventoryMap[itemName].name
+                    : "Unbekannter Gegenstand"
+            );
         const inventoryWindow = new TextSelectionWindow(this.width, 5, selections);
 
-        if(!account.inventory.isEmpty()) {
+        if (!account.inventory.isEmpty()) {
             this.makeInventoryEmbed(account, embed, keys, inventoryWindow.selection);
             this.drawMessage(this.makeInventoryText(inventoryWindow), interactiveMessage, embed);
 
@@ -449,7 +455,7 @@ export default class ShopCommand extends Command {
 
             reactionMessage.setReactionListener(2, (user) => {
                 if (user.id === message.author.id) {
-                    if(typeof account.inventory.inventoryMap[keys[inventoryWindow.selection]] !== "undefined") {
+                    if (typeof account.inventory.inventoryMap[keys[inventoryWindow.selection]] !== "undefined") {
                         reactionMessage.clearListeners();
                         embed.fields = [];
 
@@ -463,7 +469,11 @@ export default class ShopCommand extends Command {
                 }
             });
         } else {
-            this.drawMessage("Kaufe Gegenstände ein um sie hier auszurüsten und wieder zu verkaufen.", interactiveMessage, embed);
+            this.drawMessage(
+                "Kaufe Gegenstände ein um sie hier auszurüsten und wieder zu verkaufen.",
+                interactiveMessage,
+                embed
+            );
         }
 
         reactionMessage.setReactionListener(3, (user) => {
@@ -555,7 +565,7 @@ export default class ShopCommand extends Command {
             });
 
             reactionMessage.setReactionListener(2, (user) => {
-                if(!account.inventory.hasItem(item.id)) {
+                if (!account.inventory.hasItem(item.id)) {
                     embed.addField("Info", "Du besitzt dieses Item nicht mehr.");
                     this.drawMessage(this.makeInventoryOptionText(inventoryWindow), interactiveMessage, embed);
                     embed.fields = [];
@@ -571,7 +581,7 @@ export default class ShopCommand extends Command {
                     if (isEquipped) {
                         itemStructure.unequip(account, item.config);
                     } else {
-                        if(account.inventory.hasItem(item.id)) {
+                        if (account.inventory.hasItem(item.id)) {
                             itemStructure.equip(account, item.config);
                         }
                     }
@@ -695,7 +705,7 @@ export default class ShopCommand extends Command {
 
                     reactionMessage.setReactionListener(2, (user) => {
                         if (user.id === message.author.id) {
-                            if(account.inventory.hasItem(item.id)) {
+                            if (account.inventory.hasItem(item.id)) {
                                 if (!item.status.tradeOffer) {
                                     account.inventory.makeOffer(item, inputNumber);
                                     reactionMessage.clearListeners();

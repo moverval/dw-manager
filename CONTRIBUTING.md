@@ -13,3 +13,5 @@ When pulling a change to this repository, please write a detailed comment, what 
 
 We accept Pull Requests that are matching our standards and face in the same direction how we are designing this project.
 To ensure that a Pull Request will be accepted, contact the maintainers on the discord, the project was designed for.
+
+**Never send pull requests to the master branch. Please create for every new feature or bug a new branch that you want to get merged. We do not accept direct pull requests!**

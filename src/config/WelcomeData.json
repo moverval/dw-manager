@@ -1,0 +1,28 @@
+{
+    "Rejoin": {
+        "Boxes": [
+            {
+                "title": "Willkommen zurück $userTag;",
+                "message": [
+                    "Gut dass du wieder da bist!",
+                    "Schön dich wiederzusehen!",
+                    "Schön dass du wieder da bist!",
+                    "Wir freuen uns dass du uns wieder besuchst!"
+                ]
+            }
+        ]
+    },
+    "Newcomer": {
+        "Boxes": [
+            {
+                "title": "Willkommen auf dem Server $userTag;",
+                "message": [
+                    "Wir freuen uns dass du beigetreten bist!",
+                    "Wir haben dich schon erwartet $lennyface;",
+                    "GrEAT tO sEe yoU mY frIEnD!",
+                    "Danke fürs beitreten!"
+                ]
+            }
+        ]
+    }
+}

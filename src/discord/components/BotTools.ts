@@ -1,33 +1,17 @@
 import DataPoint from "../../filesystem/DataPoint";
-import { StringMap } from "../../Types";
 import Bot from "../Bot";
+import StringParser from "./util/StringParser";
 
 export default class BotTools {
+    sp: StringParser;
+
     dp: DataPoint;
     private bot: Bot;
 
     constructor(bot: Bot) {
         this.bot = bot;
-    }
-
-    convertStringVariables(text: string, values: StringMap<string>) {
-        return text.replace(
-            /\$([\w\d]+);/g,
-            (match: string, g1: string): string => {
-                return values[g1];
-            }
-        );
-    }
-
-    getGlobalVariables() {
-        const random = Math.floor(Math.random() * this.bot.client.users.cache.size);
-        const randomUsername = this.bot.client.users.cache.array()[random].username;
-
-        return {
-            prefix: this.bot.commandHandler.getPrefix(),
-            ping: "" + this.bot.client.ws.ping,
-            randomUsername,
-            randomMention: "@" + randomUsername
-        };
+        this.sp = new StringParser(bot);
     }
 }
+
+export type TextFunctionVariable = (text: string, bot: Bot) => string;

@@ -18,5 +18,10 @@
     "611883018839392256": {
         "community": false,
         "ad": true
+    },
+    "466227426436055050": {
+        "community": false,
+        "ad": false,
+        "welcome": true
     }
 }

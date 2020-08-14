@@ -86,4 +86,5 @@ export default function AdUpvote(
 export interface ChannelInformation {
     ad: boolean;
     community: boolean;
+    welcome?: boolean;
 }

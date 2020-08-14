@@ -25,6 +25,9 @@ import fs from "fs";
 import BumpEvent from "./discord/events/BumpEvent";
 import CheckCommand from "./discord/commands/admin/CheckCommand";
 import LeaderboardCommand from "./discord/commands/LeaderboardCommand";
+import CreateUserJoined from "./discord/events/CreateUserJoined";
+import TestReaction from "./discord/commands/TestReaction";
+import Welcome, { WelcomeData } from "./discord/events/Welcome";
 
 dotenv.config();
 
@@ -79,33 +82,43 @@ const bot = new Bot({
         dpConfig,
         "channelmarker_debug.json"
     );
-    channelInformationLinker.load();
+    channelInformationLinker.load(); // Loading Channel Metadata
 
     await bot.login();
 
-    bot.commandHandler.registerCommand(new PingCommand(bot, "ping"));
-    bot.commandHandler.registerCommand(new HelpCommand(bot, "help"));
-    bot.commandHandler.registerCommand(new CoinCommand(bot, "money", coinSystem));
-    bot.commandHandler.registerCommand(new TransferCommand(bot, "transfer", coinSystem));
-    bot.commandHandler.registerCommand(new AdminShopCommand(bot, "sysshop", coinSystem));
-    bot.commandHandler.registerCommand(new ShopCommand(bot, "shop", coinSystem));
-    bot.commandHandler.registerCommand(new CheckCommand(bot, "check", coinSystem));
-    bot.commandHandler.registerCommand(new LeaderboardCommand(bot, "leaderboard", coinSystem));
+    bot.commandHandler.registerCommand(new PingCommand(bot, "ping")); // Ping Command
+    bot.commandHandler.registerCommand(new HelpCommand(bot, "help")); // Help Command
+    bot.commandHandler.registerCommand(new CoinCommand(bot, "money", coinSystem)); // Money Command
+    bot.commandHandler.registerCommand(new TransferCommand(bot, "transfer", coinSystem)); // Transfer Command
+    bot.commandHandler.registerCommand(new AdminShopCommand(bot, "sysshop", coinSystem)); // Sysshop
+    bot.commandHandler.registerCommand(new ShopCommand(bot, "shop", coinSystem)); // Shop Command
+    bot.commandHandler.registerCommand(new CheckCommand(bot, "check", coinSystem)); // Administrative Check Command
+    bot.commandHandler.registerCommand(new LeaderboardCommand(bot, "leaderboard", coinSystem)); // Leaderboard Command
 
-    bot.commandHandler.assignDocumentations(documentations);
+    const welcomeInformationLinker = new JsonLinker<WelcomeData>(dpConfig, "WelcomeData.json");
+
+    bot.commandHandler.registerCommand(new TestReaction(bot, "test", coinSystem, welcomeInformationLinker));
+
+    bot.commandHandler.assignDocumentations(documentations); // Appends JSON Documentation to Commands
 
     bot.eventHandler.addEventListener("ready", ReadyEvent);
-    AdUpvote(channelInformationLinker, bot, coinSystem);
+    AdUpvote(channelInformationLinker, bot, coinSystem); // Manages Upvotes
 
-    InviteTracker(coinSystem, bot);
+    bot.eventHandler.addEventListener("guildMemberAdd", Welcome(channelInformationLinker, welcomeInformationLinker, bot, coinSystem));
+    InviteTracker(coinSystem, bot); // Tracks Invites and sends Notify Message
+
+    bot.eventHandler.addEventListener("guildMemberAdd", CreateUserJoined(coinSystem)); // Creates User after other User Add Events were executed
 
     scheduler.scheduleJob({ hour: 0, minute: 0 }, () => {
-        if(!fs.existsSync(dpData.parse("backup"))) {
+        if (!fs.existsSync(dpData.parse("backup"))) {
             fs.mkdirSync(dpData.parse("backup"));
         }
 
         Serializer.writeObject(dpData.parse("backup/coinSystem-" + new Date().toString() + ".json"), coinSystem);
-        Serializer.writeObject(dpData.parse("backup/shopSystem-" + new Date().toString() + ".json"), coinSystem.shopSystem);
+        Serializer.writeObject(
+            dpData.parse("backup/shopSystem-" + new Date().toString() + ".json"),
+            coinSystem.shopSystem
+        );
     });
 
     process.stdin.resume();

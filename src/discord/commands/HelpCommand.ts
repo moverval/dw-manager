@@ -58,9 +58,9 @@ export default class HelpCommand extends Command {
                         .setTitle(documentationObject.title)
                         .addField(
                             "Beschreibung",
-                            this.bot.util.convertStringVariables(
+                            this.bot.util.sp.merge(
                                 documentationObject.description,
-                                this.bot.util.getGlobalVariables()
+                                this.bot.util.sp.getGlobalVariables()
                             )
                         );
 

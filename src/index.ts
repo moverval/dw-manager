@@ -97,7 +97,7 @@ const bot = new Bot({
 
     const welcomeInformationLinker = new JsonLinker<WelcomeData>(dpConfig, "WelcomeData.json");
 
-    bot.commandHandler.registerCommand(new TestReaction(bot, "test", coinSystem, welcomeInformationLinker));
+    // bot.commandHandler.registerCommand(new TestReaction(bot, "test", coinSystem, welcomeInformationLinker));
 
     bot.commandHandler.assignDocumentations(documentations); // Appends JSON Documentation to Commands
 

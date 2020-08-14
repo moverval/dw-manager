@@ -1,7 +1,7 @@
 import Account from "../Account";
 import { StringMap } from "../../Types";
 import { Serializable, SerializeValue } from "../../filesystem/Types";
-import ShopSystem, {ShopRegister} from "./ShopSystem";
+import ShopSystem from "./ShopSystem";
 
 export default class Inventory implements Serializable<SerializableInventory> {
     shopSystem: ShopSystem;
@@ -25,14 +25,14 @@ export default class Inventory implements Serializable<SerializableInventory> {
                 name,
                 structure,
                 config: structureConfig,
-                status: {}
+                status: {},
             };
         }
     }
 
     removeItem(id: string) {
         if (this.hasItem(id)) {
-            this.inventoryMap[id] = undefined;
+            delete this.inventoryMap[id];
             return true;
         } else {
             return false;
@@ -40,13 +40,17 @@ export default class Inventory implements Serializable<SerializableInventory> {
     }
 
     makeOffer(item: InventoryItem, price: number) {
-        if(item.status.tradeOffer) {
+        if (item.status.tradeOffer) {
             return false;
         }
 
-        const matchingCategories = this.shopSystem.findItemCategories(this.shopSystem.shopRegister, item.structure, item.config);
+        const matchingCategories = this.shopSystem.findItemCategories(
+            this.shopSystem.shopRegister,
+            item.structure,
+            item.config
+        );
 
-        if(matchingCategories.length > 0) {
+        if (matchingCategories.length > 0) {
             ShopSystem.addItem(matchingCategories[0], this.account, price, item.id);
             item.status.tradeOffer = true;
             return true;
@@ -56,18 +60,22 @@ export default class Inventory implements Serializable<SerializableInventory> {
     }
 
     removeOffer(item: InventoryItem) {
-        if(!item.status.tradeOffer) {
+        if (!item.status.tradeOffer) {
             return false;
         }
 
-        const matchingCategories = this.shopSystem.findItemCategories(this.shopSystem.shopRegister, item.structure, item.config);
+        const matchingCategories = this.shopSystem.findItemCategories(
+            this.shopSystem.shopRegister,
+            item.structure,
+            item.config
+        );
 
         let success = false;
 
         matchingCategories.forEach((category) => {
             const index = ShopSystem.findItemIndex(category, item.id);
 
-            if(index > -1) {
+            if (index > -1) {
                 ShopSystem.removeItemByIndex(category, index);
                 item.status.tradeOffer = undefined;
                 success = true;
@@ -101,7 +109,7 @@ export interface InventoryItem {
     config: StringMap<string | number>;
     status: {
         tradeOffer?: boolean;
-    }
+    };
 }
 
 export interface SerializableInventory extends SerializeValue {

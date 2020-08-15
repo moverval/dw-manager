@@ -27,6 +27,7 @@ import CheckCommand from "./discord/commands/admin/CheckCommand";
 import LeaderboardCommand from "./discord/commands/LeaderboardCommand";
 import CreateUserJoined from "./discord/events/CreateUserJoined";
 import Welcome, { WelcomeData } from "./discord/events/Welcome";
+import EchoCommand from "./discord/commands/EchoCommand";
 
 dotenv.config();
 
@@ -93,6 +94,7 @@ const bot = new Bot({
     bot.commandHandler.registerCommand(new ShopCommand(bot, "shop", coinSystem)); // Shop Command
     bot.commandHandler.registerCommand(new CheckCommand(bot, "check", coinSystem)); // Administrative Check Command
     bot.commandHandler.registerCommand(new LeaderboardCommand(bot, "leaderboard", coinSystem)); // Leaderboard Command
+    bot.commandHandler.registerCommand(new EchoCommand(bot, "echo", false));
 
     const welcomeInformationLinker = new JsonLinker<WelcomeData>(dpConfig, "WelcomeData.json");
 
@@ -103,7 +105,10 @@ const bot = new Bot({
     bot.eventHandler.addEventListener("ready", ReadyEvent);
     AdUpvote(channelInformationLinker, bot, coinSystem); // Manages Upvotes
 
-    bot.eventHandler.addEventListener("guildMemberAdd", Welcome(channelInformationLinker, welcomeInformationLinker, bot, coinSystem));
+    bot.eventHandler.addEventListener(
+        "guildMemberAdd",
+        Welcome(channelInformationLinker, welcomeInformationLinker, bot, coinSystem)
+    );
     InviteTracker(coinSystem, bot); // Tracks Invites and sends Notify Message
 
     bot.eventHandler.addEventListener("guildMemberAdd", CreateUserJoined(coinSystem)); // Creates User after other User Add Events were executed

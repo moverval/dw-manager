@@ -9,12 +9,12 @@ export default class StringParser {
         this.bot = bot;
     }
 
-    merge(text: string, ...key: StringMap<string>[]) {
+    merge(text: string, ...key: StringMap<string | TextFunctionVariable>[]) {
         const merged = Object.assign({}, ...key);
         return this.convertStringVariables(text, merged);
     }
 
-    convertStringVariables(text: string, values: StringMap<string>) {
+    convertStringVariables(text: string, values: StringMap<string | TextFunctionVariable>) {
         return text.replace(/\$([\w\d]+);/g, (match: string, g1: string): string => {
             const value = values[g1];
 

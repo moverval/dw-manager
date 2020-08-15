@@ -26,7 +26,6 @@ import BumpEvent from "./discord/events/BumpEvent";
 import CheckCommand from "./discord/commands/admin/CheckCommand";
 import LeaderboardCommand from "./discord/commands/LeaderboardCommand";
 import CreateUserJoined from "./discord/events/CreateUserJoined";
-import TestReaction from "./discord/commands/TestReaction";
 import Welcome, { WelcomeData } from "./discord/events/Welcome";
 
 dotenv.config();

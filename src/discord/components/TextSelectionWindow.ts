@@ -73,7 +73,7 @@ export default class TextSelectionWindow extends TextWindow {
 
     private renderLineSelected(text: string) {
         const textRendered = this.renderLine(text);
-        return "# ->" + textRendered.substr(4);
+        return "-->" + textRendered.substr(3);
     }
 
     private makeArrowUp(text: string) {

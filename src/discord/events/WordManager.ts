@@ -11,12 +11,21 @@ export default function WordManager(
     channelInformationLinker: JsonLinker<StringMap<ChannelInformation>>
 ) {
     return (message: Message) => {
-        if(message.channel.type === "dm" || message.guild.id !== process.env.MAIN_GUILD) {
+        if (message.channel.type === "dm" || message.guild.id !== process.env.MAIN_GUILD) {
             return;
         }
         const channelInformation = channelInformationLinker.value[message.channel.id];
 
-        if (channelInformation && channelInformation.community) {
+        const transferSpecific = channelInformation ? channelInformation.community : null;
+
+        const transfer =
+            transferSpecific === null
+                ? channelInformationLinker.value["*"] && channelInformationLinker.value["*"].community
+                    ? true
+                    : false
+                : transferSpecific;
+
+        if (transfer) {
             const account = cs.getAccount(message.author.id);
             const splits = message.content.split(" ");
             const real = splits.filter((split) => split.length > 3);

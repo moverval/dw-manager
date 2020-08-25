@@ -11,5 +11,8 @@
         "community": false,
         "ad": false,
         "welcome": true
+    },
+    "*": {
+        "community": true
     }
 }

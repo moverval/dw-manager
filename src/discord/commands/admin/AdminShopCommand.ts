@@ -18,7 +18,7 @@ export default class AdminShopCommand extends Command {
             if (message.member.permissions.has("ADMINISTRATOR")) {
                 if (args.length > 0) {
                     switch (args[0].toLowerCase()) {
-                        case "create_category":
+                        case "create_category": // Creates a category
                         case "cc":
                             {
                                 if (args.length === 2) {
@@ -29,7 +29,7 @@ export default class AdminShopCommand extends Command {
                             }
                             break;
 
-                        case "set_name":
+                        case "set_name": // Sets a name for a category
                         case "sn":
                             {
                                 if (args.length >= 3) {
@@ -40,7 +40,7 @@ export default class AdminShopCommand extends Command {
                             }
                             break;
 
-                        case "set_structure":
+                        case "set_structure": // Sets a structure for a category
                         case "ss":
                             {
                                 if (args.length === 3) {
@@ -51,7 +51,7 @@ export default class AdminShopCommand extends Command {
                             }
                             break;
 
-                        case "delete_category":
+                        case "delete_category": // Deletes a category
                         case "dc":
                             {
                                 if (args.length === 3) {
@@ -64,13 +64,13 @@ export default class AdminShopCommand extends Command {
                             }
                             break;
 
-                        case "ls":
+                        case "ls": // Lists all categories
                             {
                                 this.listCategories(message);
                             }
                             break;
 
-                        case "info":
+                        case "info": // Outputs info from category
                         case "i":
                             {
                                 if (args.length === 2) {
@@ -81,7 +81,7 @@ export default class AdminShopCommand extends Command {
                             }
                             break;
 
-                        case "rn":
+                        case "rn": // Renames a category
                         case "rename":
                             {
                                 if (args.length === 4) {
@@ -92,7 +92,7 @@ export default class AdminShopCommand extends Command {
                             }
                             break;
 
-                        case "set_structure_config":
+                        case "set_structure_config": // Sets config of structure in category
                         case "ssc":
                             {
                                 if (args.length === 4) {
@@ -103,7 +103,7 @@ export default class AdminShopCommand extends Command {
                             }
                             break;
 
-                        case "scls":
+                        case "scls": // Lists variables in structure config
                             {
                                 if (args.length === 2) {
                                     this.structureConfigList(message, args[1]);
@@ -113,7 +113,7 @@ export default class AdminShopCommand extends Command {
                             }
                             break;
 
-                        case "sd":
+                        case "sd": // Sets description for category
                         case "set_description":
                             {
                                 if (args.length >= 3) {
@@ -122,7 +122,7 @@ export default class AdminShopCommand extends Command {
                             }
                             break;
 
-                        case "ai":
+                        case "ai": // Adds Items to category
                         case "add_item":
                             {
                                 if (args.length === 3) {
@@ -139,7 +139,7 @@ export default class AdminShopCommand extends Command {
                             }
                             break;
 
-                        case "ais":
+                        case "ais": // Adds Items to category
                         case "add_items":
                             {
                                 if (args.length === 4) {
@@ -157,7 +157,7 @@ export default class AdminShopCommand extends Command {
                             }
                             break;
 
-                        case "ri":
+                        case "ri": // Removes Item from category
                         case "remove_item":
                             {
                                 if (args.length === 3) {
@@ -168,7 +168,7 @@ export default class AdminShopCommand extends Command {
                             }
                             break;
 
-                        case "imls":
+                        case "imls": // Lists Items in category
                             {
                                 if (args.length === 2) {
                                     this.listItems(message, args[1]);

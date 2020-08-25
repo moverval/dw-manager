@@ -105,11 +105,12 @@ const bot = new Bot({
     bot.eventHandler.addEventListener("ready", ReadyEvent);
     AdUpvote(channelInformationLinker, bot, coinSystem); // Manages Upvotes
 
+    InviteTracker(coinSystem, bot); // Tracks Invites and sends Notify Message
+
     bot.eventHandler.addEventListener(
         "guildMemberAdd",
         Welcome(channelInformationLinker, welcomeInformationLinker, bot, coinSystem)
     );
-    InviteTracker(coinSystem, bot); // Tracks Invites and sends Notify Message
 
     bot.eventHandler.addEventListener("guildMemberAdd", CreateUserJoined(coinSystem)); // Creates User after other User Add Events were executed
 

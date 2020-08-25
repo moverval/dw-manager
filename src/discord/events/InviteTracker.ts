@@ -23,10 +23,10 @@ export default async function InviteTracker(coinSystem: CoinSystem, bot: Bot) {
         const newInvites = await member.guild.fetchInvites();
         guildInvites.set(member.guild.id, newInvites);
 
-        if(coinSystem.isAccount(member.id)) {
-            return;
-        }
-        coinSystem.createAccount(member.id);
+        // if (coinSystem.isAccount(member.id)) {
+        //     return;
+        // }
+        // coinSystem.createAccount(member.id);
 
         try {
             const inviteUsed = newInvites.find((invite) => cachedInvites.get(invite.code).uses < invite.uses);
@@ -35,6 +35,7 @@ export default async function InviteTracker(coinSystem: CoinSystem, bot: Bot) {
                 const account = coinSystem.getAccount(inviteUsed.inviter.id);
                 const mainGuild = bot.client.guilds.cache.find((guild) => guild.id === process.env.MAIN_GUILD);
                 if (mainGuild) {
+                    await mainGuild.fetch();
                     const channel = mainGuild.channels.cache.get(process.env.CONFIRMATION_CHANNEL);
                     if (channel && channel.type === "text") {
                         const embed = new MessageEmbed();

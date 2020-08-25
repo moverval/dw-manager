@@ -107,6 +107,10 @@ export default class ShopCommand extends Command {
         });
 
         reactionMessage.setReactionListener(2, (user) => {
+            if (user.id !== message.author.id) {
+                return;
+            }
+
             embed.setFooter("");
 
             switch (homeWindow.selection) {
@@ -132,7 +136,9 @@ export default class ShopCommand extends Command {
         });
 
         reactionMessage.setReactionListener(3, (user) => {
-            this.closeShopMessage(reactionMessage);
+            if (user.id === message.author.id) {
+                this.closeShopMessage(reactionMessage);
+            }
         });
     }
 

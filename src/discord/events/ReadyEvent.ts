@@ -1,16 +1,13 @@
-import ClientEvent from "../abstract/ClientEvent";
+import EventModule, { ClientEvent } from "../abstract/EventModule";
 import Bot from "../Bot";
 
-function Ready() {
-    console.log("Bot started");
-}
-
-export default class ReadyEvent extends ClientEvent<"ready"> {
+export default class ReadyEvent extends EventModule {
     constructor(bot: Bot) {
-        super("StartMessage", "ready", bot);
+        super("StartMessage", bot);
     }
 
-    run() {
+    @ClientEvent("ready")
+    OutputConsoleReadyMessage() {
         console.log("Bot started");
     }
 }

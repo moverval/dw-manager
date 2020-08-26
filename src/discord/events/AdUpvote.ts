@@ -7,7 +7,6 @@ import { ReactionType } from "../components/ReactionMessage";
 import CoinSystem from "../../coinsystem/CoinSystem";
 import { AccountEarnType } from "../../coinsystem/AccountEarnConfig";
 import schedule from "node-schedule";
-import ClientEvent from "../abstract/ClientEvent";
 
 // export default class AdUpvote extends ClientEvent<"message"> {
 //     channelInformationLinker: JsonLinker<StringMap<ChannelInformation>>;

@@ -1,5 +1,5 @@
 import { ClientEvents } from "discord.js";
-import ClientEvent from "../abstract/ClientEvent";
+import ClientEvent from "../abstract/EventModule";
 import EventHandler from "./EventHandler";
 
 export default class EventServiceHandler {
@@ -9,13 +9,17 @@ export default class EventServiceHandler {
         this.eventHandler = eventHandler;
     }
 
-    register<K extends keyof ClientEvents>(eventService: ClientEvent<K>) {
-        return this.eventHandler.addEventListener(eventService.Type as K, (...args: ClientEvents[K]) =>
-            eventService.call("main", ...args)
-        );
-    }
+    register(eventService: ClientEvent) {
+        const proto = Object.getPrototypeOf(eventService);
 
-    remove<K extends keyof ClientEvents>(eventService: ClientEvent<K>, id: number) {
-        return this.eventHandler.removeEventListener(eventService.Type as K, id);
+        for (const func in proto) {
+            if (typeof proto[func] === "function") {
+                const funcProto = proto[func].prototype;
+                if (funcProto.isEvent) {
+                    console.log("Registering " + funcProto.eventType + " Event in " + eventService.Name);
+                    this.eventHandler.addEventListener(funcProto.eventType, proto[func]);
+                }
+            }
+        }
     }
 }

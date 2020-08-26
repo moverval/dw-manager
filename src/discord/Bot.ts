@@ -22,7 +22,7 @@ export default class Bot {
     commands: CommandMap = {};
     prefix: string;
     token: string;
-    eventHandler: EventHandler;
+    private eventHandler: EventHandler;
     eventServiceHandler: EventServiceHandler;
     commandHandler: CommandHandler;
     reactionManager: ReactionManager;

@@ -13,7 +13,7 @@ export default abstract class EventModule extends Service {
 
 type EventFunction<K extends keyof ClientEvents> = (...args: ClientEvents[K]) => any;
 
-export function ClientEvent(type: string) {
+export function ClientEvent<K extends keyof ClientEvents>(type: K) {
     return (target: object, key: string | symbol, descriptor: PropertyDescriptor) => {
         const desc = Object.getOwnPropertyDescriptor(target, key);
         const funcProto = desc.value.prototype;

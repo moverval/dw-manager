@@ -17,7 +17,7 @@ export default class EventServiceHandler {
                 const funcProto = proto[func].prototype;
                 if (funcProto.isEvent) {
                     console.log("Registering " + funcProto.eventType + " Event in " + eventService.Name);
-                    this.eventHandler.addEventListener(funcProto.eventType, proto[func]);
+                    this.eventHandler.addEventListener(funcProto.eventType, proto[func].bind(eventService));
                 }
             }
         }

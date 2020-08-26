@@ -102,18 +102,14 @@ const bot = new Bot({
 
     bot.commandHandler.assignDocumentations(documentations); // Appends JSON Documentation to Commands
 
-    // bot.eventHandler.addEventListener("ready", ReadyEvent);
     bot.eventServiceHandler.register(new ReadyEvent(bot));
-    AdUpvote(channelInformationLinker, bot, coinSystem); // Manages Upvotes
+    bot.eventServiceHandler.register(new AdUpvote(bot, coinSystem, channelInformationLinker));
+    bot.eventServiceHandler.register(new InviteTracker(bot, coinSystem));
+    bot.eventServiceHandler.register(new WordManager(bot, coinSystem, channelInformationLinker));
+    bot.eventServiceHandler.register(new BumpEvent(bot, coinSystem));
 
-    InviteTracker(coinSystem, bot); // Tracks Invites and sends Notify Message
-
-    bot.eventHandler.addEventListener(
-        "guildMemberAdd",
-        Welcome(channelInformationLinker, welcomeInformationLinker, bot, coinSystem)
-    );
-
-    bot.eventHandler.addEventListener("guildMemberAdd", CreateUserJoined(coinSystem)); // Creates User after other User Add Events were executed
+    bot.eventServiceHandler.register(new Welcome(bot, coinSystem, channelInformationLinker, welcomeInformationLinker));
+    bot.eventServiceHandler.register(new CreateUserJoined(bot, coinSystem));
 
     scheduler.scheduleJob({ hour: 0, minute: 0 }, () => {
         if (!fs.existsSync(dpData.parse("backup"))) {
@@ -133,9 +129,6 @@ const bot = new Bot({
         Serializer.writeObject(dpData.parse("shopSystem.json"), coinSystem.shopSystem);
         process.exit(0);
     };
-
-    bot.eventHandler.addEventListener("message", WordManager(coinSystem, channelInformationLinker));
-    bot.eventHandler.addEventListener("message", BumpEvent(coinSystem));
 
     process.on("exit", closeHandler);
     process.on("SIGINT", closeHandler);

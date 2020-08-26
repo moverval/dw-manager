@@ -19,7 +19,7 @@ export default class HelpCommand extends Command {
                 if (this.bot.commandHandler.commands[commandName]) {
                     const command = this.bot.commandHandler.commands[commandName];
 
-                    if (command.visible) {
+                    if (command.Visible) {
                         embed.addField(
                             command.invoke,
                             "```" + this.bot.commandHandler.prefix + this.invoke + " " + command.invoke + "```"
@@ -43,7 +43,7 @@ export default class HelpCommand extends Command {
                 const command = this.bot.commandHandler.commands[path.shift()];
                 const documentationObject = this.getDocumentationObject(path, command.documentation);
 
-                if (!command.visible && !adminPermissions) {
+                if (!command.Visible && !adminPermissions) {
                     message.channel.send(
                         new MessageEmbed()
                             .setTitle("Zugriff auf Befehl verweigert")

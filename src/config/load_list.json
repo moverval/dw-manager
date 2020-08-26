@@ -1,0 +1,37 @@
+{
+    "commands": {
+        "echo": {
+            "enabled": true,
+            "public": false
+        },
+        "transfer": {
+            "enabled": true,
+            "public": true
+        },
+        "sysshop": {
+            "enabled": true,
+            "public": false
+        },
+        "shop": {
+            "enabled": true,
+            "public": true
+        },
+        "money": {
+            "enabled": true,
+            "public": true
+        },
+        "help": {
+            "enabled": true,
+            "public": true
+        },
+        "leaderboard": {
+            "enabled": true,
+            "public": false
+        },
+        "check": {
+            "enabled": true,
+            "public": false
+        }
+    },
+    "events": {}
+}

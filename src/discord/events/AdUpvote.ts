@@ -7,6 +7,39 @@ import { ReactionType } from "../components/ReactionMessage";
 import CoinSystem from "../../coinsystem/CoinSystem";
 import { AccountEarnType } from "../../coinsystem/AccountEarnConfig";
 import schedule from "node-schedule";
+import ClientEvent from "../abstract/ClientEvent";
+
+// export default class AdUpvote extends ClientEvent<"message"> {
+//     channelInformationLinker: JsonLinker<StringMap<ChannelInformation>>;
+//     coinSystem: CoinSystem;
+//     reactionManager: ReactionManager;
+//     voteMap: StringMap<number>;
+//     voteReversedMap: StringMap<number>;
+
+//     constructor(channelInformationLinker: JsonLinker<StringMap<ChannelInformation>>, bot: Bot, coinSystem: CoinSystem) {
+//         super("AdUpvote", "message", bot);
+
+//         this.channelInformationLinker = channelInformationLinker;
+//         this.coinSystem = coinSystem;
+
+//         this.initEvent();
+//     }
+
+//     initEvent() {
+//         this.reactionManager = new ReactionManager(this.bot.eventHandler, ReactionHandle.COUNTER);
+
+//         this.voteMap = {};
+//         this.voteReversedMap = {};
+
+//         schedule.scheduleJob({ hour: 0, minute: 0 }, () => {
+//             this.voteMap = {};
+//             this.voteReversedMap = {};
+//             this.reactionManager.clearMessages();
+//         });
+//     }
+
+//     run(message: Message) {}
+// }
 
 export default function AdUpvote(
     channelInformationLinker: JsonLinker<StringMap<ChannelInformation>>,
@@ -25,7 +58,7 @@ export default function AdUpvote(
     });
 
     bot.eventHandler.addEventListener("message", (message: Message) => {
-        if(message.channel.type === "dm") {
+        if (message.channel.type === "dm") {
             return;
         }
 
@@ -47,7 +80,7 @@ export default function AdUpvote(
                             return;
                         }
 
-                        if(voteMap[user.id] && voteMap[user.id] > 9) {
+                        if (voteMap[user.id] && voteMap[user.id] > 9) {
                             const reaction = message.reactions.cache.find(
                                 (subReaction) => subReaction.emoji.name === "⬆️"
                             );
@@ -56,7 +89,7 @@ export default function AdUpvote(
                             return;
                         }
 
-                        if(!voteMap[user.id]) {
+                        if (!voteMap[user.id]) {
                             voteMap[user.id] = 0;
                         }
 
@@ -67,11 +100,10 @@ export default function AdUpvote(
                             const voteUserAccount = coinSystem.getAccount(user.id);
                             voteUserAccount.add(AccountEarnType.AD_GOOD_UPVOTE, 1);
                         }
-
                     } else if (reactionType === ReactionType.CANCEL) {
                         voteMap[user.id] -= 1;
 
-                        if(voteMap[user.id] > 9) {
+                        if (voteMap[user.id] > 9) {
                             return;
                         }
 

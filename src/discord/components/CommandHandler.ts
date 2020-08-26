@@ -73,6 +73,20 @@ export default class CommandHandler {
         }
     }
 
+    loadCommand(command: Command, config: LoadConfig) {
+        if (config[command.invoke]) {
+            const loadOption = config[command.invoke];
+
+            if (typeof loadOption.public !== "undefined") {
+                command.Visible = loadOption.public;
+            }
+
+            if (loadOption.enabled) {
+                this.registerCommand(command);
+            }
+        }
+    }
+
     getPrefix() {
         return this.prefix;
     }
@@ -84,4 +98,13 @@ export default class CommandHandler {
             }
         }
     }
+}
+
+export interface LoadConfig {
+    [invoke: string]: LoadOption;
+}
+
+export interface LoadOption {
+    enabled?: boolean;
+    public?: boolean;
 }

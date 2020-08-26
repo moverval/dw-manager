@@ -11,7 +11,16 @@ import Bot from "../Bot";
 export default abstract class Command {
     bot: Bot;
     documentation: DocumentationObject;
-    readonly visible: boolean;
+    private visible: boolean;
+
+    get Visible() {
+        return this.visible;
+    }
+
+    set Visible(visible: boolean) {
+        this.visible = visible;
+    }
+
     readonly invoke: string;
 
     constructor(bot: Bot, invoke: string, visible?: boolean) {
@@ -33,5 +42,5 @@ export enum ReturnValue {
     WRONG_BOOTUP,
     UNKNOWN_PARAMETER,
     WRONG_NOTATION,
-    INVALID_COMMAND
+    INVALID_COMMAND,
 }

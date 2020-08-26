@@ -1,10 +1,12 @@
 import { StringMap } from "../../Types";
 import { ClientEvents, Client } from "discord.js";
+import Service from "./Service";
 
 type EventListener = (...args: any) => void;
 
 export default class EventHandler {
     events: StringMap<Array<{ id: number; listener: EventListener }>> = {};
+    services: StringMap<Array<{ id: number; serivice: Service }>> = {};
     client: Client;
     count = 1;
 
@@ -37,7 +39,7 @@ export default class EventHandler {
         this.events[key].forEach((obj) => {
             try {
                 obj.listener(...args);
-            } catch(Error) {
+            } catch (Error) {
                 console.error(Error);
             }
         });

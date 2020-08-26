@@ -34,12 +34,14 @@ export default class StringParser {
     getGlobalVariables() {
         const random = Math.floor(Math.random() * this.bot.client.users.cache.size);
         const randomUsername = this.bot.client.users.cache.array()[random].username;
+        const date = new Date();
 
         return {
             prefix: this.bot.commandHandler.getPrefix(),
             ping: "" + this.bot.client.ws.ping,
             randomUsername,
             randomMention: "@" + randomUsername,
+            time: `${date.getMinutes()}:${date.getHours()}`,
         };
     }
 }

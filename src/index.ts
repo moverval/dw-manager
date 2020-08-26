@@ -102,7 +102,8 @@ const bot = new Bot({
 
     bot.commandHandler.assignDocumentations(documentations); // Appends JSON Documentation to Commands
 
-    bot.eventHandler.addEventListener("ready", ReadyEvent);
+    // bot.eventHandler.addEventListener("ready", ReadyEvent);
+    bot.eventServiceHandler.register(new ReadyEvent(bot));
     AdUpvote(channelInformationLinker, bot, coinSystem); // Manages Upvotes
 
     InviteTracker(coinSystem, bot); // Tracks Invites and sends Notify Message

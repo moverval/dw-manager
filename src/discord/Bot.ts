@@ -23,7 +23,7 @@ export default class Bot {
     prefix: string;
     token: string;
     private eventHandler: EventHandler;
-    eventServiceHandler: EventServiceHandler;
+    service: EventServiceHandler;
     commandHandler: CommandHandler;
     reactionManager: ReactionManager;
     userInputManager: UserInputManager;
@@ -37,7 +37,7 @@ export default class Bot {
         this.prefix = options.prefix;
         if (!options.noEventHandler) {
             this.eventHandler = new EventHandler(this.client);
-            this.eventServiceHandler = new EventServiceHandler(this.eventHandler);
+            this.service = new EventServiceHandler(this.eventHandler);
 
             if (!options.noCommandHandler) {
                 this.commandHandler = new CommandHandler(this.eventHandler, this.prefix);

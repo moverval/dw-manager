@@ -102,14 +102,14 @@ const bot = new Bot({
 
     bot.commandHandler.assignDocumentations(documentations); // Appends JSON Documentation to Commands
 
-    bot.eventServiceHandler.register(new ReadyEvent(bot));
-    bot.eventServiceHandler.register(new AdUpvote(bot, coinSystem, channelInformationLinker));
-    bot.eventServiceHandler.register(new InviteTracker(bot, coinSystem));
-    bot.eventServiceHandler.register(new WordManager(bot, coinSystem, channelInformationLinker));
-    bot.eventServiceHandler.register(new BumpEvent(bot, coinSystem));
+    bot.service.register(new ReadyEvent(bot));
+    bot.service.register(new AdUpvote(bot, coinSystem, channelInformationLinker));
+    bot.service.register(new InviteTracker(bot, coinSystem));
+    bot.service.register(new WordManager(bot, coinSystem, channelInformationLinker));
+    bot.service.register(new BumpEvent(bot, coinSystem));
 
-    bot.eventServiceHandler.register(new Welcome(bot, coinSystem, channelInformationLinker, welcomeInformationLinker));
-    bot.eventServiceHandler.register(new CreateUserJoined(bot, coinSystem));
+    bot.service.register(new Welcome(bot, coinSystem, channelInformationLinker, welcomeInformationLinker));
+    bot.service.register(new CreateUserJoined(bot, coinSystem));
 
     scheduler.scheduleJob({ hour: 0, minute: 0 }, () => {
         if (!fs.existsSync(dpData.parse("backup"))) {

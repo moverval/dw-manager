@@ -27,7 +27,7 @@ export default class AdUpvote extends EventModule {
     }
 
     initAdUpvote() {
-        this.reactionManager = new ReactionManager(this.bot.eventHandler, ReactionHandle.COUNTER);
+        this.reactionManager = new ReactionManager(this.bot.EventHandler, ReactionHandle.COUNTER);
         this.voteMap = {};
         this.voteReversedMap = {};
 
@@ -102,7 +102,7 @@ function AdUpvote2(
     bot: Bot,
     coinSystem: CoinSystem
 ) {
-    const reactionManager = new ReactionManager(bot.eventHandler, ReactionHandle.COUNTER);
+    const reactionManager = new ReactionManager(bot.EventHandler, ReactionHandle.COUNTER);
 
     let voteMap: StringMap<number> = {};
     let voteReversedMap: StringMap<number> = {};
@@ -113,7 +113,7 @@ function AdUpvote2(
         reactionManager.clearMessages();
     });
 
-    bot.eventHandler.addEventListener("message", (message: Message) => {
+    bot.EventHandler.addEventListener("message", (message: Message) => {
         if (message.channel.type === "dm") {
             return;
         }

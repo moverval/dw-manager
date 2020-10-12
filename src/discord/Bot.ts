@@ -29,6 +29,10 @@ export default class Bot {
     userInputManager: UserInputManager;
     util: BotTools;
 
+    get EventHandler() {
+        return this.eventHandler;
+    }
+
     constructor(options: BotInitializerList) {
         this.client = new Client({
             partials: ["MESSAGE", "CHANNEL", "REACTION"],

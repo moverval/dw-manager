@@ -11,7 +11,7 @@ export default class UserInputManager {
         this.bot = bot;
         this.inputMap = {};
         this.timeoutMap = {};
-        this.bot.eventHandler.addEventListener("message", this.eventHandler.bind(this));
+        this.bot.EventHandler.addEventListener("message", this.eventHandler.bind(this));
     }
 
     eventHandler(message: Message) {
@@ -30,7 +30,7 @@ export default class UserInputManager {
         this.timeoutMap[userId + channelId] = setTimeout(() => {
             this.clearUserInput(userId, channelId);
 
-            if(onTimeout) {
+            if (onTimeout) {
                 onTimeout();
             }
         }, timeout);
@@ -39,10 +39,10 @@ export default class UserInputManager {
     }
 
     clearUserInput(userId: string, channelId: string) {
-        if(this.inputMap[userId + channelId]) {
+        if (this.inputMap[userId + channelId]) {
             this.inputMap[userId + channelId] = undefined;
 
-            if(this.timeoutMap[userId + channelId]) {
+            if (this.timeoutMap[userId + channelId]) {
                 clearTimeout(this.timeoutMap[userId + channelId]);
             }
 

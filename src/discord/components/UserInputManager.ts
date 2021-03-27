@@ -17,28 +17,38 @@ export default class UserInputManager {
     eventHandler(message: Message) {
         if (this.inputMap[message.author.id + message.channel.id]) {
             const func = this.inputMap[message.author.id + message.channel.id];
-            this.clearUserInput(message.author.id, message.channel.id);
+            this.clearInputFunction(message.author.id, message.channel.id);
             func(message);
         }
     }
 
     getUserInput(userId: string, channelId: string, fn: InputFunction, timeout: number = 60000, onTimeout?: () => any) {
+        if (this.setInputFunction(userId, channelId, fn)) {
+            this.timeoutMap[userId + channelId] = setTimeout(() => {
+                this.clearInputFunction(userId, channelId);
+
+                if (onTimeout) {
+                    onTimeout();
+                }
+            }, timeout);
+
+            return false;
+        } else {
+            return false;
+        }
+    }
+
+    setInputFunction(userId: string, channelId: string, fn: InputFunction): boolean {
         if (this.inputMap[userId + channelId]) {
             return false;
         }
 
-        this.timeoutMap[userId + channelId] = setTimeout(() => {
-            this.clearUserInput(userId, channelId);
-
-            if (onTimeout) {
-                onTimeout();
-            }
-        }, timeout);
-
         this.inputMap[userId + channelId] = fn;
+
+        return true;
     }
 
-    clearUserInput(userId: string, channelId: string) {
+    clearInputFunction(userId: string, channelId: string) {
         if (this.inputMap[userId + channelId]) {
             this.inputMap[userId + channelId] = undefined;
 

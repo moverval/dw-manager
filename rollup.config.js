@@ -41,7 +41,7 @@ export default [
             }
         ],
         plugins: [
-            typescript(),
+            typescript({ useTsconfigDeclarationDir: true }),
             builtins()
         ]
     }

@@ -24,5 +24,11 @@
                 ]
             }
         ]
+    },
+    "Details": {
+        "Information": {
+            "title": "Information",
+            "description": "Wir empfehlen dir diese Informationen durchzulesen"
+        }
     }
 }

@@ -19,6 +19,15 @@ export default class InviteTracker extends EventModule {
         this.guildInvites.set(invite.guild.id, await invite.guild.fetchInvites());
     }
 
+    @ClientEvent("ready")
+    async ReadyInvite() {
+        const guild = this.bot.client.guilds.cache.find((guild, _key, _collection) => guild.id == process.env["MAIN_GUILD"]);
+
+        if (guild != undefined) {
+            this.guildInvites.set(guild.id, await guild.fetchInvites());
+        }
+    }
+
     @ClientEvent("guildMemberAdd")
     async MemberJoined(member: GuildMember | PartialGuildMember) {
         const cachedInvites = this.guildInvites.get(member.guild.id);
@@ -31,7 +40,15 @@ export default class InviteTracker extends EventModule {
         // coinSystem.createAccount(member.id);
 
         try {
-            const inviteUsed = newInvites.find((invite) => cachedInvites.get(invite.code).uses < invite.uses);
+            const inviteUsed = newInvites.find((invite) => {
+                const cachedInvite = cachedInvites.get(invite.code);
+
+                if (cachedInvite == undefined) {
+                    return false;
+                }
+
+                return cachedInvite.uses < invite.uses;
+            });
 
             if (inviteUsed) {
                 const account = this.coinSystem.getAccount(inviteUsed.inviter.id);

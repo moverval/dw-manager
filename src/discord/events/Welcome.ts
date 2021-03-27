@@ -70,7 +70,8 @@ export default class Welcome extends EventModule {
 
             const embed = makeWelcomeEmbed(
                 this.bot.util.sp.merge(randomBox.title, this.bot.util.sp.getGlobalVariables(), localVars),
-                this.bot.util.sp.merge(randomBoxMessage, this.bot.util.sp.getGlobalVariables(), localVars)
+                this.bot.util.sp.merge(randomBoxMessage, this.bot.util.sp.getGlobalVariables(), localVars),
+                this.messageLinker.value.Details.Information
             );
 
             welcomeChannel.send(`<@${member.id}>`).then((mMsg) => {
@@ -82,12 +83,12 @@ export default class Welcome extends EventModule {
     }
 }
 
-export function makeWelcomeEmbed(title: string, description: string) {
+export function makeWelcomeEmbed(title: string, description: string, information: FieldInformation) {
     const embed = new MessageEmbed();
     embed.setTitle(title).setDescription(description);
     const randomColor = "#" + createRandomLightColor();
     embed.setColor(randomColor);
-    embed.addField("Information", "Wir empfehlen dir diese Informationen durchzulesen: <#611866257502896133>");
+    embed.addField(information.title, information.description);
     return embed;
 }
 
@@ -98,9 +99,17 @@ export interface WelcomeData {
     Newcomer: {
         Boxes: WelcomeBox[];
     };
+    Details: {
+        Information: FieldInformation,
+    }
 }
 
 export interface WelcomeBox {
     title: string;
     message: string[];
+}
+
+export interface FieldInformation {
+    title: string;
+    description: string;
 }

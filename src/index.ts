@@ -97,6 +97,7 @@ const bot = new Bot({
     bot.commandHandler.registerCommand(new EchoCommand(bot, "echo", false));
 
     const welcomeInformationLinker = new JsonLinker<WelcomeData>(dpConfig, "WelcomeData.json");
+    welcomeInformationLinker.load();
 
     // bot.commandHandler.registerCommand(new TestReaction(bot, "test", coinSystem, welcomeInformationLinker));
 

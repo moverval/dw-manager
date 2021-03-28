@@ -63,6 +63,7 @@ export default class InviteTracker extends EventModule {
                     const channel = this.guild.channels.cache.get(process.env.CONFIRMATION_CHANNEL);
                     if (channel && channel.type === "text") {
                         if (this.coinSystem.isAccount(member.id)) {
+                            console.log("User already has account");
                             return;
                         }
 

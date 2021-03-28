@@ -25,6 +25,10 @@ export default class BumpEvent extends EventModule {
         }
 
         if (message.guild.id === process.env.MAIN_GUILD) {
+            if (!this.coinSystem.isAccount(message.author.id)) {
+                return;
+            }
+
             const account = this.coinSystem.getAccount(message.author.id);
 
             if (message.content === "!d bump") {

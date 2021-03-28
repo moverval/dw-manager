@@ -13,8 +13,10 @@ export default class CreateUserJoined extends EventModule {
 
     @ClientEvent("guildMemberAdd")
     MemberJoined(member: GuildMember | PartialGuildMember) {
-        if (!this.coinSystem.isAccount(member.id)) {
-            this.coinSystem.createAccount(member.id);
-        }
+        setTimeout(() => {
+            if (!this.coinSystem.isAccount(member.id)) {
+                this.coinSystem.createAccount(member.id);
+            }
+        }, 1000);
     }
 }

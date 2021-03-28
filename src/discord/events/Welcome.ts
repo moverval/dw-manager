@@ -51,7 +51,6 @@ export default class Welcome extends EventModule {
 
     @ClientEvent("guildMemberAdd")
     MemberJoined(member: GuildMember | PartialGuildMember) {
-        console.log("Member joined event called");
         const isAccount = this.coinSystem.isAccount(member.id);
 
         if (this.guild == null) {

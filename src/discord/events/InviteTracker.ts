@@ -33,7 +33,6 @@ export default class InviteTracker extends EventModule {
 
     @ClientEvent("guildMemberAdd")
     async MemberJoined(member: GuildMember | PartialGuildMember) {
-        console.log("Test1");
         const cachedInvites = this.guildInvites.get(member.guild.id);
         if (member.guild.id != process.env["MAIN_GUILD"]) {
             return;
@@ -48,7 +47,6 @@ export default class InviteTracker extends EventModule {
         // coinSystem.createAccount(member.id);
 
         try {
-            console.log("Test2");
             const inviteUsed = newInvites.find((invite) => {
                 const cachedInvite = cachedInvites.get(invite.code);
 
@@ -59,15 +57,11 @@ export default class InviteTracker extends EventModule {
                 return cachedInvite.uses < invite.uses;
             });
 
-            console.log("Test3");
             if (inviteUsed) {
-                console.log("Test4");
                 const account = this.coinSystem.getAccount(inviteUsed.inviter.id);
                 if (this.guild) {
-                    console.log("Test5");
                     const channel = this.guild.channels.cache.get(process.env.CONFIRMATION_CHANNEL);
                     if (channel && channel.type === "text") {
-                        console.log("Test6");
                         const embed = new MessageEmbed();
                         embed
                             .setTitle("Bestätigung erforderlich")

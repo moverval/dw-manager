@@ -57,13 +57,21 @@ export default class EchoCommand extends Command {
 
         let echoOutput = this.bot.util.sp.merge(args.join(" "), this.bot.util.sp.getGlobalVariables(), vars);
 
+        let echoSplits = echoOutput.split("\n");
+        let echoTitle = "Ausgabe";
+        let echoDescription = echoOutput;
+        if (echoSplits.length > 1) {
+            echoTitle = echoSplits.shift();
+            echoDescription = echoSplits.join("\n");
+        }
+
         if(echoOutput === "") {
             echoOutput = "<KEINE-AUSGABE>";
         }
 
         embed
-            .setTitle("Ausgabe")
-            .setDescription(echoOutput)
+            .setTitle(echoTitle)
+            .setDescription(echoDescription)
             .setColor("#" + createRandomLightColor());
 
         message.channel.send(embed);

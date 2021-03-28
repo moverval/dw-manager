@@ -1,4 +1,4 @@
-import { GuildMember, MessageEmbed, TextChannel, PartialGuildMember } from "discord.js";
+import { GuildMember, MessageEmbed, TextChannel, PartialGuildMember, Guild } from "discord.js";
 import JsonLinker from "../loaders/JsonLinker";
 import { ChannelInformation } from "./AdUpvote";
 import { StringMap } from "../../Types";
@@ -11,6 +11,7 @@ export default class Welcome extends EventModule {
     coinSystem: CoinSystem;
     channelLinker: JsonLinker<StringMap<ChannelInformation>>;
     messageLinker: JsonLinker<WelcomeData>;
+    guild: Guild;
 
     welcomeChannelArray: string[] = [];
 
@@ -41,12 +42,25 @@ export default class Welcome extends EventModule {
         });
     }
 
+    @ClientEvent("ready")
+    async GetChannels() {
+        const guild = this.bot.client.guilds.resolve(process.env["MAIN_GUILD"]);
+        
+        this.guild = await guild.fetch();
+    }
+
     @ClientEvent("guildMemberAdd")
     MemberJoined(member: GuildMember | PartialGuildMember) {
+        console.log("Member joined event called");
         const isAccount = this.coinSystem.isAccount(member.id);
 
+        if (this.guild == null) {
+            console.log("Welcome component has no guild access");
+            return;
+        }
+
         const welcomeChannels = this.welcomeChannelArray
-            .map((channelId) => member.guild.channels.cache.get(channelId))
+            .map((channelId) => this.guild.channels.resolve(channelId))
             .filter((value) => value !== null);
 
         if (welcomeChannels.length > 0) {
@@ -79,6 +93,8 @@ export default class Welcome extends EventModule {
             });
 
             welcomeChannel.send(embed);
+        } else {
+            console.log("No Welcome channels found");
         }
     }
 }

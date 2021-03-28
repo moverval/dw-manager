@@ -1,12 +1,10 @@
 import { StringMap } from "../../Types";
 import { ClientEvents, Client } from "discord.js";
-import Service from "./Service";
 
 type EventListener = (...args: any) => void;
 
 export default class EventHandler {
     events: StringMap<Array<{ id: number; listener: EventListener }>> = {};
-    services: StringMap<Array<{ id: number; serivice: Service }>> = {};
     client: Client;
     count = 1;
 
@@ -17,6 +15,7 @@ export default class EventHandler {
     addEventListener<K extends keyof ClientEvents>(event: K, listener: (...args: ClientEvents[K]) => void) {
         if (!this.events[event]) {
             this.events[event] = [];
+            console.log("Binding distributor for event " + event);
             this.client.on(event, this.distributor.bind(this, event));
         }
 
@@ -38,6 +37,7 @@ export default class EventHandler {
     private call<K extends keyof ClientEvents>(key: K, ...args: ClientEvents[K]) {
         this.events[key].forEach((obj) => {
             try {
+                console.log("This is really working");
                 obj.listener(...args);
             } catch (Error) {
                 console.error(Error);

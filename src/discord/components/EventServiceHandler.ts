@@ -15,6 +15,7 @@ export default class EventServiceHandler {
             if (typeof proto[func] === "function") {
                 const funcProto = proto[func].prototype;
                 if (funcProto.isEvent) {
+                    console.log("Registered event " + funcProto.eventType + " for function " + func + " in module " + eventService.constructor.name);
                     this.eventHandler.addEventListener(funcProto.eventType, proto[func].bind(eventService));
                 }
             }

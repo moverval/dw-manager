@@ -42,7 +42,7 @@ export default class StringParser {
             randomUsername,
             randomMention: "@" + randomUsername,
             time: `${date.getMinutes()}:${date.getHours()}`,
-            memberCount: this.bot.client.guilds.cache.find((guild, _key, _collection) => guild.id == process.env["MAIN_GUILD"]).memberCount + " "
+            memberCount: this.bot.client.guilds.cache.find((guild, _key, _collection) => guild.id == process.env["MAIN_GUILD"]).memberCount + ""
         };
     }
 }

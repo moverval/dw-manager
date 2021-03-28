@@ -62,6 +62,10 @@ export default class InviteTracker extends EventModule {
                 if (this.guild) {
                     const channel = this.guild.channels.cache.get(process.env.CONFIRMATION_CHANNEL);
                     if (channel && channel.type === "text") {
+                        if (this.coinSystem.isAccount(member.id)) {
+                            return;
+                        }
+
                         const embed = new MessageEmbed();
                         embed
                             .setTitle("Bestätigung erforderlich")

@@ -17,12 +17,16 @@ export default class UserInputManager {
     eventHandler(message: Message) {
         if (this.inputMap[message.author.id + message.channel.id]) {
             const func = this.inputMap[message.author.id + message.channel.id];
-            this.clearInputFunction(message.author.id, message.channel.id);
+            if (this.timeoutMap[message.author.id + message.channel.id]) {
+                this.clearInputFunction(message.author.id, message.channel.id);
+            }
+
             func(message);
         }
     }
 
     getUserInput(userId: string, channelId: string, fn: InputFunction, timeout: number = 60000, onTimeout?: () => any) {
+        fn.prototype.once = true;
         if (this.setInputFunction(userId, channelId, fn)) {
             this.timeoutMap[userId + channelId] = setTimeout(() => {
                 this.clearInputFunction(userId, channelId);

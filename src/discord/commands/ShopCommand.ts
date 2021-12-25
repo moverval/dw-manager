@@ -1,14 +1,14 @@
 import Command, { ReturnValue } from "../abstract/Command";
 import { Message, MessageEmbed, ReactionEmoji, GuildEmoji, User } from "discord.js";
-import TextSelectionWindow from "../components/TextSelectionWindow";
 import ShopSystem, { ShopRegister, BuyStatus, ShopItem } from "../../coinsystem/shop/ShopSystem";
 import CoinSystem from "../../coinsystem/CoinSystem";
 import Bot from "../Bot";
-import TextWindow from "../components/TextWindow";
 import Account from "../../coinsystem/Account";
 import { StringMap } from "../../Types";
 import ReactionMessage, { ReactionType } from "../components/ReactionMessage";
 import { InventoryItem } from "../../coinsystem/shop/Inventory";
+import TextSelectionWindow from "../../window/windowSystem/TextSelectionWindow";
+import TextWindow from "../../window/windowSystem/abstract/TextWindow";
 
 export default class ShopCommand extends Command {
     loadingMessage: string = "Laden...";
@@ -83,6 +83,7 @@ export default class ShopCommand extends Command {
 
     private displayHomeWindow(message: Message, interactiveMessage: Message, embed: MessageEmbed) {
         const homeWindow = new TextSelectionWindow(this.width, 3, ["Kaufen", "Inventar", "Schließen"]);
+        /* const homeWindow = new TextSelectionWindow(this.getReactionMessage(message), this.bot.userInputManager, 20, 3, ["Kaufen", "Inventar", "Schließen"]); */
         const reactionMessage = this.getReactionMessage(interactiveMessage);
 
         embed.setFooter("Du kannst mit den unten angeführten Reaktionen die\nSteuerfläche navigieren.");

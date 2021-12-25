@@ -1,48 +1,51 @@
-import TextWindow, { Input, InputType } from "../../abstract/TextWindow";
-import { TextSelectionContext } from "../textStructure/TextSelectionContext";
-import ReactionMessage from "../ReactionMessage";
-import UserInputManager from "../UserInputManager";
+import TextWindow, { Input, InputType } from "./abstract/TextWindow";
+import { TextSelectionContext } from "./TextSelectionContext";
+import Bot from "../../discord/Bot";
+import { Message } from "discord.js";
+import TextWindowManager from "./TextWindowManager";
 
 export default class TextSelectionWindow extends TextWindow {
     textSelectionContext: TextSelectionContext;
 
-    constructor(
-        reactionMessage: ReactionMessage,
-        userInputManager: UserInputManager,
-        width: number,
-        height: number,
-        selections: string[]
-    ) {
-        super(userInputManager, reactionMessage);
-        this.textSelectionContext = new TextSelectionContext(width, height);
-        this.textSelectionContext.setInput(selections);
+    constructor(message: Message, width: number, height: number, selections: string[]) {
+        super(message);
+        this.textSelectionContext = new TextSelectionContext(width, height, selections);
     }
 
+    onLoad(_bot: Bot, _textWindowManager: TextWindowManager) {}
+
     render() {
-        this.embed.setDescription(this.textSelectionContext.render());
+        this.embedCreator.setDescription(this.textSelectionContext.render());
         this.update();
     }
 
     onInput(input: Input) {
         switch (input.inputType) {
             case InputType.CONFIRMATION:
+                this.createMessageNotifier("Ausgewählter Wert: **" + this.textSelectionContext.getSelectedItem() + "**");
             case InputType.ABORT:
-            case InputType.MOVE_UP:
-                this.textSelectionContext.moveUp();
-                this.render();
-                break;
-            case InputType.MOVE_DOWN:
-                this.textSelectionContext.moveDown();
-                this.render();
-                break;
-            case InputType.MESSAGE:
-                this.createMessageNotifier();
-                break;
+                this.windowManager.unload();
+            break;
         }
+        this.textSelectionContext.handleInput(
+            input,
+            () => {
+                this.render();
+                this.removeMessageNotifier();
+            },
+            (warning: string) => {
+                this.createMessageNotifier(warning);
+                this.render();
+            }
+        );
     }
 
-    createMessageNotifier() {
-        this.embed.addField("Achtung", "Dieses Fenster unterstützt keine Texteingaben", false);
+    createMessageNotifier(warning: string) {
+        this.embedCreator.setField("Achtung", warning);
         this.render();
+    }
+
+    removeMessageNotifier() {
+        this.embedCreator.removeField("Achtung");
     }
 }

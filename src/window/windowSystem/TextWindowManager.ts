@@ -1,9 +1,10 @@
 import InputContext from "./InputContext";
 import ReactionMessage from "../../discord/components/ReactionMessage";
 import { Unloadable } from "../../Types";
-import TextWindow from "./abstract/TextWindow";
+import TextWindow, { Input } from "./abstract/TextWindow";
 import Bot from "../../discord/Bot";
 import { Message } from "discord.js";
+import TextAddin from "./abstract/TextAddin";
 
 export default class TextWindowManager implements Unloadable {
     window: TextWindow;
@@ -12,6 +13,7 @@ export default class TextWindowManager implements Unloadable {
     bot: Bot;
     message: Message;
     userId: string;
+    addins: TextAddin[];
 
     constructor(
         bot: Bot,
@@ -23,6 +25,7 @@ export default class TextWindowManager implements Unloadable {
         this.message = message;
         this.window = window;
         this.userId = userId;
+        this.addins = [];
     }
 
     activate() {
@@ -32,7 +35,7 @@ export default class TextWindowManager implements Unloadable {
           this.window.render();
         };
 
-        this.inputContext = new InputContext(this.reactionMessage, this.bot.userInputManager, this.userId);
+        this.inputContext = new InputContext(this, this.userId);
         this.inputContext.load();
     }
 
@@ -41,17 +44,60 @@ export default class TextWindowManager implements Unloadable {
     setLoadWindow() {}
 
     setWindow(window: TextWindow) {
+        this.addins.forEach((addin) => {
+            const tmp = addin.onSetWindow(window);
+            if (tmp !== null) {
+                console.log("This shit didn't prevent it");
+                window = tmp;
+            }
+        });
+
         this.window = window;
         this.window.windowManager = this;
         this.window.bot = this.bot;
         this.window.onLoad();
-        this.inputContext.setWindow(this.window);
+    }
+
+    onInput(input: Input) {
+        this.addins.forEach((addin) => {
+            const tmp = addin.onInput(input);
+            if (tmp !== null) {
+                input = tmp;
+            }
+        });
+
+        this.window.onInput(input);
+    }
+
+    addin(addin: TextAddin) {
+        this.addins.push(addin);
+    }
+
+    updateWindow() {
+        let creator = this.window.embedCreator;
+        this.addins.forEach((addin) => {
+            const tmp = addin.onRender(creator);
+            if (tmp !== null) {
+                creator = tmp;
+            }
+        });
+
+        this.reactionMessage.message.edit({ content: " ", embeds: [creator.build()] });
     }
 
     unload() {
-        this.window.unload();
-        this.inputContext.unload();
-        this.reactionMessage.remove();
-        // TODO Set close window
+        let unload = true;
+        this.addins.forEach((addin) => {
+            const tmp = addin.onUnload();
+            if (tmp !== null) {
+                unload = tmp;
+            }
+        });
+
+        if (unload) {
+            this.window.unload();
+            this.inputContext.unload();
+            this.reactionMessage.remove();
+        }
     }
 }

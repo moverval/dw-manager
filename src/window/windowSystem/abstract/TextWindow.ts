@@ -29,16 +29,12 @@ export default abstract class TextWindow implements Unloadable {
     embedCreator: EmbedCreator;
     bot: Bot;
 
-    get message() {
-      return this.windowManager.reactionMessage.message;
-    }
-
     constructor() {
         this.embedCreator = new EmbedCreator();
     }
 
     update(): void {
-        this.message.edit({ embeds: [this.embedCreator.build()], content: " " });
+        this.windowManager.updateWindow();
     }
 
     abstract onLoad(): void;

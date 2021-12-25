@@ -3,6 +3,7 @@ import Command, { ReturnValue } from "../abstract/Command";
 import { Message } from "discord.js";
 import TextWindowManager from "../../window/windowSystem/TextWindowManager";
 import TextSelectionWindow from "../../window/windowSystem/TextSelectionWindow";
+import Timeout from "../../window/windowSystem/addin/Timeout";
 
 export default class WindowTest extends Command {
     constructor(bot: Bot, invoke: string) {
@@ -21,6 +22,7 @@ export default class WindowTest extends Command {
                 selectionWindow.windowManager.unload();
             };
             const windowManager = new TextWindowManager(this.bot, message, selectionWindow, user_message.author.id);
+            windowManager.addin(new Timeout(windowManager, 10));
 
             windowManager.activate();
         });

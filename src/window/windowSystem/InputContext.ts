@@ -1,51 +1,40 @@
-import UserInputManager from "../../discord/components/UserInputManager";
 import { Message, User } from "discord.js";
-import ReactionMessage from "../../discord/components/ReactionMessage";
-import TextWindow, { InputType, Input } from "./abstract/TextWindow";
+import { InputType, Input } from "./abstract/TextWindow";
 import { Unloadable } from "../../Types";
+import TextWindowManager from "./TextWindowManager";
 
 export default class InputContext implements Unloadable {
-    inputManager: UserInputManager;
-    reactionMessage: ReactionMessage;
     userId: string;
     channelId: string;
-    window: TextWindow;
+    manager: TextWindowManager;
 
-    constructor(reactionMessage: ReactionMessage, inputManager: UserInputManager, userId: string) {
-        this.inputManager = inputManager;
+    constructor(manager: TextWindowManager, userId: string) {
         this.userId = userId;
-        this.channelId = reactionMessage.message.channel.id;
-        this.reactionMessage = reactionMessage;
+        this.manager = manager;
+        this.channelId = this.manager.reactionMessage.message.channel.id;
     }
 
     load() {
-        this.inputManager.setInputFunction(this.userId, this.channelId, this.inputFunction.bind(this));
-        this.reactionMessage.setReactionListener(0, this.makeReactionListener(InputType.MOVE_UP).bind(this));
-        this.reactionMessage.setReactionListener(1, this.makeReactionListener(InputType.MOVE_DOWN).bind(this));
-        this.reactionMessage.setReactionListener(2, this.makeReactionListener(InputType.CONFIRMATION).bind(this));
-        this.reactionMessage.setReactionListener(3, this.makeReactionListener(InputType.ABORT).bind(this));
-    }
-
-    // Can also get null as parameter
-    setWindow(window: TextWindow) {
-        this.window = window;
+        this.manager.bot.userInputManager.setInputFunction(this.userId, this.channelId, this.inputFunction.bind(this));
+        this.manager.reactionMessage.setReactionListener(0, this.makeReactionListener(InputType.MOVE_UP).bind(this));
+        this.manager.reactionMessage.setReactionListener(1, this.makeReactionListener(InputType.MOVE_DOWN).bind(this));
+        this.manager.reactionMessage.setReactionListener(2, this.makeReactionListener(InputType.CONFIRMATION).bind(this));
+        this.manager.reactionMessage.setReactionListener(3, this.makeReactionListener(InputType.ABORT).bind(this));
     }
 
     makeReactionListener(inputType: InputType) {
         return (user?: User) => {
-            if (this.window && user?.id == this.userId) {
-                this.window.onInput(new Input(inputType, ""));
+            if (user?.id == this.userId) {
+                this.manager.onInput(new Input(inputType, ""))
             }
         };
     }
 
     inputFunction(message: Message) {
-        if (this.window) {
-            this.window.onInput(new Input(InputType.MESSAGE, message.content));
-        }
+        this.manager.onInput(new Input(InputType.MESSAGE, message.content));
     }
 
     unload() {
-        this.inputManager.clearInputFunction(this.userId, this.channelId);
+        this.manager.bot.userInputManager.clearInputFunction(this.userId, this.channelId);
     }
 }

@@ -28,6 +28,7 @@ import LeaderboardCommand from "./discord/commands/LeaderboardCommand";
 import CreateUserJoined from "./discord/events/CreateUserJoined";
 import Welcome, { WelcomeData } from "./discord/events/Welcome";
 import EchoCommand from "./discord/commands/EchoCommand";
+import WindowTest from "./discord/commands/WindowTest";
 
 dotenv.config();
 
@@ -91,10 +92,11 @@ const bot = new Bot({
     bot.commandHandler.registerCommand(new CoinCommand(bot, "money", coinSystem)); // Money Command
     bot.commandHandler.registerCommand(new TransferCommand(bot, "transfer", coinSystem)); // Transfer Command
     bot.commandHandler.registerCommand(new AdminShopCommand(bot, "sysshop", coinSystem)); // Sysshop
-    bot.commandHandler.registerCommand(new ShopCommand(bot, "shop", coinSystem)); // Shop Command
+    /* bot.commandHandler.registerCommand(new ShopCommand(bot, "shop", coinSystem)); // Shop Command */
     bot.commandHandler.registerCommand(new CheckCommand(bot, "check", coinSystem)); // Administrative Check Command
     bot.commandHandler.registerCommand(new LeaderboardCommand(bot, "leaderboard", coinSystem)); // Leaderboard Command
     bot.commandHandler.registerCommand(new EchoCommand(bot, "echo", false));
+    bot.commandHandler.registerCommand(new WindowTest(bot, "test"));
 
     const welcomeInformationLinker = new JsonLinker<WelcomeData>(dpConfig, "WelcomeData.json");
     welcomeInformationLinker.load();

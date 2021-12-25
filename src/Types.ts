@@ -5,3 +5,7 @@ export interface StringMap<T> {
 export interface NumberMap<T> {
     [key: number]: T;
 }
+
+export interface Unloadable {
+    unload(): void;
+}

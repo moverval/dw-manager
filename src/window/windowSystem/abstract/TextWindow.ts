@@ -2,6 +2,7 @@ import Bot from "../../../discord/Bot";
 import { Message } from "discord.js";
 import TextWindowManager from "../TextWindowManager";
 import EmbedCreator from "../EmbedCreator";
+import { Unloadable } from "../../../Types";
 
 export enum InputType {
     CONFIRMATION,
@@ -23,21 +24,26 @@ export class Input {
 }
 
 // General rendered Window in Discord Chat
-export default abstract class TextWindow {
+export default abstract class TextWindow implements Unloadable {
     windowManager: TextWindowManager;
     embedCreator: EmbedCreator;
-    message: Message;
+    bot: Bot;
 
-    constructor(message: Message) {
+    get message() {
+      return this.windowManager.reactionMessage.message;
+    }
+
+    constructor() {
         this.embedCreator = new EmbedCreator();
-        this.message = message;
     }
 
     update(): void {
-        this.message.edit({ embeds: [this.embedCreator.build()] });
+        this.message.edit({ embeds: [this.embedCreator.build()], content: " " });
     }
 
+    abstract onLoad(): void;
+
     abstract render(): void;
-    abstract onLoad(bot: Bot, textWindowManager: TextWindowManager): void;
     abstract onInput(input: Input): void;
+    abstract unload(): boolean;
 }

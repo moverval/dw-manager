@@ -1,30 +1,30 @@
 import TextWindow, { Input, InputType } from "./abstract/TextWindow";
 import { TextSelectionContext } from "./TextSelectionContext";
-import Bot from "../../discord/Bot";
-import { Message } from "discord.js";
-import TextWindowManager from "./TextWindowManager";
 
 export default class TextSelectionWindow extends TextWindow {
     textSelectionContext: TextSelectionContext;
+    onConfirmation: (selection: number) => any;
+    onCancel: () => any;
 
-    constructor(message: Message, width: number, height: number, selections: string[]) {
-        super(message);
+    constructor(width: number, height: number, selections: string[]) {
+        super();
         this.textSelectionContext = new TextSelectionContext(width, height, selections);
     }
-
-    onLoad(_bot: Bot, _textWindowManager: TextWindowManager) {}
 
     render() {
         this.embedCreator.setDescription(this.textSelectionContext.render());
         this.update();
     }
 
+    onLoad(): void {}
+
     onInput(input: Input) {
         switch (input.inputType) {
             case InputType.CONFIRMATION:
-                this.createMessageNotifier("Ausgewählter Wert: **" + this.textSelectionContext.getSelectedItem() + "**");
+                this.onConfirmation(this.textSelectionContext.selection);
+            break;
             case InputType.ABORT:
-                this.windowManager.unload();
+                this.onCancel();
             break;
         }
         this.textSelectionContext.handleInput(
@@ -47,5 +47,9 @@ export default class TextSelectionWindow extends TextWindow {
 
     removeMessageNotifier() {
         this.embedCreator.removeField("Achtung");
+    }
+
+    unload(): boolean {
+      return true;
     }
 }

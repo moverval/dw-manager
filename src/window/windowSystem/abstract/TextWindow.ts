@@ -34,7 +34,7 @@ export default abstract class TextWindow {
     }
 
     update(): void {
-        this.message.edit("", { embed: this.embedCreator.build() });
+        this.message.edit({ embeds: [this.embedCreator.build()] });
     }
 
     abstract render(): void;

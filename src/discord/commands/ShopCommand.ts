@@ -33,7 +33,7 @@ export default class ShopCommand extends Command {
         const embed = new MessageEmbed();
         embed.setTitle("Shop").setDescription(this.loadingMessage).setFooter("");
 
-        message.channel.send(embed).then((interactiveMessage) => {
+        message.channel.send({ embeds: [embed] }).then((interactiveMessage) => {
             const reactionMessage = this.bot.reactionManager.createMessage(interactiveMessage, "⬆️", "⬇️", "☑️", "🔴");
             reactionMessage.onReactionsAdded = () => {
                 this.reactionMessages[interactiveMessage.id] = reactionMessage;
@@ -92,6 +92,7 @@ export default class ShopCommand extends Command {
             if (user.id === message.author.id) {
                 if (homeWindow.selection > 0) {
                     homeWindow.selection -= 1;
+                    homeWindow.update();
                     this.drawMessage(this.makeHomeText(homeWindow), interactiveMessage, embed);
                 }
             }
@@ -784,7 +785,7 @@ export default class ShopCommand extends Command {
 
     private drawMessage(text: string, interactiveMessage: Message, embed: MessageEmbed) {
         embed.setDescription(text);
-        interactiveMessage.edit(embed);
+        interactiveMessage.edit({ embeds: [embed] });
     }
 
     private wrapText(text: string, wrapAt: number) {

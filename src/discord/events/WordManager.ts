@@ -21,7 +21,7 @@ export default class WordManager extends EventModule {
 
     @ClientEvent("message")
     WordEvent(message: Message) {
-        if (message.channel.type === "dm" || message.guild.id !== process.env.MAIN_GUILD) {
+        if (message.channel.type === "DM" || message.guild.id !== process.env.MAIN_GUILD) {
             return;
         }
         const channelInformation = this.channelInformationLinker.value[message.channel.id];

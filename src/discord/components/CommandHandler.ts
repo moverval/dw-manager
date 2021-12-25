@@ -6,14 +6,16 @@ import { DocumentationLinker } from "../loaders/JsonLinker";
 
 export default class CommandHandler {
     private static makeMessageListener(prefix: string, commands: CommandMap) {
+        CommandHandler.makeMessageListener.prototype = {};
         CommandHandler.makeMessageListener.prototype.cmdNf = new MessageEmbed()
             .setTitle("Befehl existiert nicht")
             .setDescription("Nutze `++help` um alle verfügbaren Befehle einzusehen.");
 
-        return (message: Message) => {
-            if (message.channel.type === "dm") {
+        return (message: Message<boolean>) => {
+            if (message.channel.type === "DM") {
                 return;
             }
+
             if (!message.guild || message.guild.id !== process.env.MAIN_GUILD) {
                 return;
             }
@@ -33,7 +35,7 @@ export default class CommandHandler {
                                     .setDescription(
                                         `Nutze \`\`${prefix}help ${commands[invoke].invoke}\`\` um Hilfe für den Befehl zu erhalten`
                                     );
-                                message.channel.send(embed);
+                                message.channel.send({embeds: [embed]});
                             }
                             break;
 

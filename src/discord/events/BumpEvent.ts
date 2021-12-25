@@ -20,7 +20,7 @@ export default class BumpEvent extends EventModule {
 
     @ClientEvent("message")
     BumpMade(message: Message) {
-        if (message.channel.type === "dm") {
+        if (message.channel.type === "DM") {
             return;
         }
 

@@ -1,4 +1,4 @@
-import { Message, MessageReaction, User, PartialUser } from "discord.js";
+import { Message, MessageReaction, User, PartialUser, PartialMessageReaction } from "discord.js";
 import EventHandler from "./EventHandler";
 import ReactionMessage, { ReactionType } from "./ReactionMessage";
 import { StringMap } from "../../Types";
@@ -37,7 +37,7 @@ export default class ReactionManager {
         this.Messages[id] = undefined;
     }
 
-    async reactionButton(reaction: MessageReaction, user: User | PartialUser) {
+    async reactionButton(reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) {
         if (reaction.partial) {
             reaction = await reaction.fetch();
         }
@@ -57,7 +57,7 @@ export default class ReactionManager {
     }
 
     reactionCounter(reactionType: ReactionType) {
-        return async (reaction: MessageReaction, user: User | PartialUser) => {
+        return async (reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) => {
             if (reaction.partial) {
                 reaction = await reaction.fetch();
             }

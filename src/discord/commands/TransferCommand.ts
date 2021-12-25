@@ -15,7 +15,7 @@ export default class TransferCommand extends Command {
 
     run(message: Message, args: string[]): ReturnValue {
         if (message.mentions.users.size === 1) {
-            const receiver = message.mentions.users.array()[0];
+            const receiver = message.mentions.users.at(0);
 
             if (receiver.id === message.author.id) {
                 message.channel.send("...");
@@ -43,7 +43,7 @@ export default class TransferCommand extends Command {
                             )
                             .addField("Status", "Interaktion erforderlich");
 
-                        message.channel.send(embed).then((interactiveMessage) => {
+                        message.channel.send({ embeds: [embed] }).then((interactiveMessage) => {
                             const reactionMessage = this.bot.reactionManager.createMessage(
                                 interactiveMessage,
                                 "✅",
@@ -60,7 +60,7 @@ export default class TransferCommand extends Command {
                                     reactionMessage.remove();
                                     embed.setTitle(`Münzen an ${receiver.username} übertragen`);
                                     embed.fields[1].value = "Akzeptiert";
-                                    interactiveMessage.edit(embed);
+                                    interactiveMessage.edit({ embeds: [embed] });
                                     interactiveMessage.reactions.removeAll();
                                 }
                             });
@@ -72,7 +72,7 @@ export default class TransferCommand extends Command {
                                     reactionMessage.remove();
                                     embed.setTitle(`Münzen an ${receiver.username} nicht übertragen`);
                                     embed.fields[1].value = "Abgelehnt";
-                                    interactiveMessage.edit(embed);
+                                    interactiveMessage.edit({ embeds: [embed] });
                                     interactiveMessage.reactions.removeAll();
                                 }
                             };
@@ -88,7 +88,7 @@ export default class TransferCommand extends Command {
                         embed
                             .setTitle("Zu wenig Geld")
                             .setDescription("Du besitzt zu wenig Geld um diesen Betrag zu überweisen");
-                        message.channel.send(embed);
+                        message.channel.send({ embeds: [embed] });
                     }
                 } else {
                     return ReturnValue.WRONG_NOTATION;
@@ -111,7 +111,7 @@ export default class TransferCommand extends Command {
                         } else {
                             const subEmbed = new MessageEmbed();
                             subEmbed.setTitle("Fehler").setDescription("Account mit der ID '" + args[0] + "' nicht gefunden");
-                            message.channel.send(subEmbed);
+                            message.channel.send({ embeds: [subEmbed] });
                             return ReturnValue.FAILED_EXECUTING;
                         }
                     }
@@ -122,7 +122,7 @@ export default class TransferCommand extends Command {
                         } else {
                             const subEmbed = new MessageEmbed();
                             subEmbed.setTitle("Fehler").setDescription("Account mit der ID '" + args[1] + "' nicht gefunden");
-                            message.channel.send(subEmbed);
+                            message.channel.send({ embeds: [subEmbed] });
                             return ReturnValue.FAILED_EXECUTING;
                         }
                     }
@@ -132,7 +132,7 @@ export default class TransferCommand extends Command {
                     if(isNaN(amount)) {
                         const subEmbed = new MessageEmbed();
                         subEmbed.setTitle("Fehler").setDescription("Der 3. Parameter muss eine Zahl sein");
-                        message.channel.send(subEmbed);
+                        message.channel.send({ embeds: [subEmbed] });
                         return ReturnValue.FAILED_EXECUTING;
                     }
 
@@ -142,7 +142,7 @@ export default class TransferCommand extends Command {
                     this.coinSystem.removeTransfer(transfer.id);
                     const embed = new MessageEmbed();
                     embed.setTitle("Erfolgreich").setDescription("Übertragung wurde ausgeführt");
-                    message.channel.send(embed);
+                    message.channel.send({ embeds: [embed] });
                     return ReturnValue.SUCCESS;
                 }
             }

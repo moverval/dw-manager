@@ -33,7 +33,7 @@ export default class StringParser {
 
     getGlobalVariables() {
         const random = Math.floor(Math.random() * this.bot.client.users.cache.size);
-        const randomUsername = this.bot.client.users.cache.array()[random].username;
+        const randomUsername = this.bot.client.users.cache.at(random).username;
         const date = new Date();
 
         return {

@@ -248,7 +248,7 @@ export default class AdminShopCommand extends Command {
 
         const text = this.listCat(this.coinSystem.shopSystem.shopRegister, "", 0);
         embed.setDescription(text);
-        message.channel.send(embed);
+        message.channel.send({ embeds: [embed] });
     }
 
     listCat(sr: ShopRegister, message: string, indent: number) {
@@ -295,7 +295,7 @@ export default class AdminShopCommand extends Command {
                 embed.addField("Unterkategorien", subCategoryStr);
             }
 
-            message.channel.send(embed);
+            message.channel.send({ embeds: [embed] });
         } else {
             message.channel.send("Kategorie nicht gefunden.");
         }
@@ -381,7 +381,7 @@ export default class AdminShopCommand extends Command {
         }
 
         embed.setDescription(output);
-        message.channel.send(embed);
+        message.channel.send({ embeds: [embed] });
     }
 
     setDescription(message: Message, category: string, text: string) {
@@ -452,7 +452,7 @@ export default class AdminShopCommand extends Command {
             }
 
             embed.setTitle("Items").setDescription(text);
-            message.channel.send(embed);
+            message.channel.send({ embeds: [embed] });
         } else {
             message.channel.send("Kategorie wurde nicht gefunden.");
         }

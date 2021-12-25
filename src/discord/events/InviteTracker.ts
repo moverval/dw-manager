@@ -17,7 +17,9 @@ export default class InviteTracker extends EventModule {
 
     @ClientEvent("inviteCreate")
     async InviteRegisterUpdate(invite: Invite) {
-        this.guildInvites.set(invite.guild.id, await invite.guild.fetchInvites());
+        const guild = await invite.guild.fetch();
+        const invites = await guild.invites.fetch();
+        this.guildInvites.set(invite.guild.id, invites);
     }
 
     @ClientEvent("ready")
@@ -27,7 +29,7 @@ export default class InviteTracker extends EventModule {
 
         if (guild != undefined) {
             this.guild = await guild.fetch();
-            this.guildInvites.set(this.guild.id, await this.guild.fetchInvites());
+            this.guildInvites.set(this.guild.id, await this.guild.invites.fetch());
         }
     }
 
@@ -38,7 +40,7 @@ export default class InviteTracker extends EventModule {
             return;
         }
 
-        const newInvites = await this.guild.fetchInvites();
+        const newInvites = await this.guild.invites.fetch();
         this.guildInvites.set(member.guild.id, newInvites);
 
         // if (coinSystem.isAccount(member.id)) {
@@ -61,7 +63,7 @@ export default class InviteTracker extends EventModule {
                 const account = this.coinSystem.getAccount(inviteUsed.inviter.id);
                 if (this.guild) {
                     const channel = this.guild.channels.cache.get(process.env.CONFIRMATION_CHANNEL);
-                    if (channel && channel.type === "text") {
+                    if (channel && channel.type === "GUILD_TEXT") {
                         if (this.coinSystem.isAccount(member.id)) {
                             console.log("User already has account");
                             return;
@@ -77,7 +79,11 @@ export default class InviteTracker extends EventModule {
                                     AccountEarnType.INVITED_PERSON
                                 )}C`
                             );
-                        const message = await (channel as TextChannel).send(embed);
+                        const message = await (channel as TextChannel).send({
+                          embeds: [
+                              embed
+                          ]
+                        });
                         const reactionMessage = this.bot.reactionManager.createMessage(message, "✅", "❎");
                         reactionMessage.setReactionListener(0, (user) => {
                             if (this.guild.members.cache.get(user.id).permissions.has("ADMINISTRATOR")) {

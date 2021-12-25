@@ -15,9 +15,9 @@ type EventFunction<K extends keyof ClientEvents> = (...args: ClientEvents[K]) =>
 
 export function ClientEvent<K extends keyof ClientEvents>(type: K) {
     return (target: object, key: string | symbol, descriptor: PropertyDescriptor) => {
-        const desc = Object.getOwnPropertyDescriptor(target, key);
-        const funcProto = desc.value.prototype;
-        funcProto.isEvent = true;
-        funcProto.eventType = type;
+        // const desc = Object.getOwnPropertyDescriptor(target, key);
+        // const funcProto = descriptor.value.prototype;
+        descriptor.value.isEvent = true;
+        descriptor.value.eventType = type;
     };
 }

@@ -1,4 +1,4 @@
-import { Client } from "discord.js";
+import { Client, Intents } from "discord.js";
 import { CommandMap } from "./Types";
 import EventHandler from "./components/EventHandler";
 import CommandHandler from "./components/CommandHandler";
@@ -35,7 +35,14 @@ export default class Bot {
 
     constructor(options: BotInitializerList) {
         this.client = new Client({
-            partials: ["MESSAGE", "CHANNEL", "REACTION"],
+          intents: [
+            Intents.FLAGS.GUILDS,
+            Intents.FLAGS.GUILD_BANS,
+            Intents.FLAGS.GUILD_INVITES,
+            Intents.FLAGS.GUILD_MEMBERS,
+            Intents.FLAGS.GUILD_MESSAGES,
+            Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+          ]
         });
         this.token = options.token;
         this.prefix = options.prefix;

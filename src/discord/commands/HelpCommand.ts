@@ -28,7 +28,7 @@ export default class HelpCommand extends Command {
                 }
             }
 
-            message.channel.send(embed);
+            message.channel.send({embeds: [embed]});
         } else if (args.length === 1) {
             const path = args[0].split(".");
             let adminPermissions = false;
@@ -44,11 +44,13 @@ export default class HelpCommand extends Command {
                 const documentationObject = this.getDocumentationObject(path, command.documentation);
 
                 if (!command.Visible && !adminPermissions) {
-                    message.channel.send(
+                    message.channel.send({
+                      embeds: [
                         new MessageEmbed()
                             .setTitle("Zugriff auf Befehl verweigert")
-                            .setDescription("Nutze `++help` um alle verfügbaren Befehle zu sehen.")
-                    );
+                            .setDescription("Nutze `++help` um alle verfügbaren Befehle zu sehen."),
+                      ]
+                    });
                     return ReturnValue.SUCCESS;
                 }
 
@@ -71,7 +73,11 @@ export default class HelpCommand extends Command {
                         );
                     }
 
-                    message.channel.send(embed);
+                    message.channel.send({
+                      embeds: [
+                          embed
+                      ]
+                    });
                 } else {
                     message.channel.send("Keine Dokumentation gefunden :(");
                 }
@@ -90,7 +96,9 @@ export default class HelpCommand extends Command {
                         .setTitle("Eingänge")
                         .setDescription("```" + this.getDocumentationObjectStringified(docObj) + "```");
 
-                    message.channel.send(embed);
+                    message.channel.send({
+                      embeds: [embed]
+                    });
                 }
             }
         } else {

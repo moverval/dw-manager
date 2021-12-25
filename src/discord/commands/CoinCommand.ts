@@ -16,13 +16,15 @@ export default class CoinCommand extends Command {
             const account = this.coinSystem.getAccount(message.author.id);
             const embed = new MessageEmbed();
             embed.setTitle("Coins").setDescription("Du besitzt zurzeit **" + account.coins + "** Münzen.");
-            message.channel.send(embed);
+            message.channel.send({
+              embeds: [embed],
+            });
         } else {
             const embed = new MessageEmbed();
             let user: User;
 
-            if(message.mentions.users.array().length === 1) {
-                user = message.mentions.users.array()[0];
+            if(message.mentions.users.size == 1) {
+                user = message.mentions.users.at(0);
             } else if(args.length === 1) {
                 const member = message.guild.members.cache.get(args[0]);
                 if(member) {
@@ -41,7 +43,9 @@ export default class CoinCommand extends Command {
                 embed.setTitle("Fehler").setDescription("Nutzer nicht gefunden.");
             }
 
-            message.channel.send(embed);
+            message.channel.send({
+              embeds: [embed],
+            });
         }
 
         return ReturnValue.SUCCESS;

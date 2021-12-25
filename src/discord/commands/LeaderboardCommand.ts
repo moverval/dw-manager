@@ -44,7 +44,7 @@ export default class LeaderboardCommand extends Command {
                 .setDescription(text)
                 .setTitle("Leaderboard")
                 .setFooter(`Seite ${site + 1}/${Math.ceil((sortedAccountKeys.length - 1) / this.siteSize)}`);
-            message.channel.send(embed);
+            message.channel.send({ embeds: [embed] });
         } else {
             message.channel.send("Diese Seite existiert nicht.");
         }

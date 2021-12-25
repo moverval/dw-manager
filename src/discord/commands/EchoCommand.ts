@@ -72,9 +72,9 @@ export default class EchoCommand extends Command {
         embed
             .setTitle(echoTitle)
             .setDescription(echoDescription)
-            .setColor("#" + createRandomLightColor());
+            .setColor(createRandomLightColor());
 
-        message.channel.send(embed);
+        message.channel.send({ embeds: [embed] });
 
         return ReturnValue.SUCCESS;
     }

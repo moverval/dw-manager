@@ -40,7 +40,7 @@ export default class AdUpvote extends EventModule {
 
     @ClientEvent("message")
     AdMessageRegister(message: Message) {
-        if (message.channel.type === "dm") {
+        if (message.channel.type === "DM") {
             return;
         }
 
@@ -114,7 +114,7 @@ function AdUpvote2(
     });
 
     bot.EventHandler.addEventListener("message", (message: Message) => {
-        if (message.channel.type === "dm") {
+        if (message.channel.type === "DM") {
             return;
         }
 

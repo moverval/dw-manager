@@ -14,7 +14,7 @@ export default class CheckCommand extends Command {
     run(message: Message, args: string[]): ReturnValue {
         if (message.member.permissions.has("ADMINISTRATOR")) {
             message.guild.members.fetch().then((members) => {
-                members.array().forEach((member) => {
+                members.forEach((member) => {
                     this.coinSystem.getAccount(member.user.id);
                 });
             });

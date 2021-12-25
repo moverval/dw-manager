@@ -91,7 +91,7 @@ export default class Welcome extends EventModule {
                 mMsg.delete();
             });
 
-            welcomeChannel.send(embed);
+            welcomeChannel.send({ embeds: [embed] });
         } else {
             console.log("No Welcome channels found");
         }
@@ -101,8 +101,7 @@ export default class Welcome extends EventModule {
 export function makeWelcomeEmbed(title: string, description: string, information: FieldInformation) {
     const embed = new MessageEmbed();
     embed.setTitle(title).setDescription(description);
-    const randomColor = "#" + createRandomLightColor();
-    embed.setColor(randomColor);
+    embed.setColor(createRandomLightColor());
     embed.addField(information.title, information.description);
     return embed;
 }

@@ -96,7 +96,7 @@ const bot = new Bot({
     bot.commandHandler.registerCommand(new CheckCommand(bot, "check", coinSystem)); // Administrative Check Command
     bot.commandHandler.registerCommand(new LeaderboardCommand(bot, "leaderboard", coinSystem)); // Leaderboard Command
     bot.commandHandler.registerCommand(new EchoCommand(bot, "echo", false));
-    bot.commandHandler.registerCommand(new WindowTest(bot, "test"));
+    bot.commandHandler.registerCommand(new WindowTest(bot, coinSystem, "test"));
 
     const welcomeInformationLinker = new JsonLinker<WelcomeData>(dpConfig, "WelcomeData.json");
     welcomeInformationLinker.load();

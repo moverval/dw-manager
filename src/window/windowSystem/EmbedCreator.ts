@@ -37,7 +37,11 @@ export default class EmbedCreator {
         });
 
         this.statusFields.forEach((description, title) => {
-            embed.addField(title, description, false);
+            if (title === "footer") {
+                embed.setFooter(description);
+            } else {
+                embed.addField(title, description, false);
+            }
         });
 
         return embed;

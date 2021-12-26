@@ -4,6 +4,7 @@ import { TextSelectionContext } from "./TextSelectionContext";
 export default class TextSelectionWindow extends TextWindow {
     textSelectionContext: TextSelectionContext;
     onConfirmation: (selection: number) => any;
+    onSelect: (selection: number) => any;
     onCancel: () => any;
 
     constructor(width: number, height: number, selections: string[]) {
@@ -30,6 +31,10 @@ export default class TextSelectionWindow extends TextWindow {
         this.textSelectionContext.handleInput(
             input,
             () => {
+                if (this.onSelect) {
+                    this.onSelect(this.textSelectionContext.selection);
+                }
+
                 this.render();
                 this.removeMessageNotifier();
             },

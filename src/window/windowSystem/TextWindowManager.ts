@@ -31,8 +31,7 @@ export default class TextWindowManager implements Unloadable {
     activate() {
         this.reactionMessage = this.bot.reactionManager.createMessage(this.message, "⬆️", "⬇️", "☑️", "🔴");
         this.reactionMessage.onReactionsAdded = () => {
-          this.setWindow(this.window);
-          this.window.render();
+            this.newWindow(this.window);
         };
 
         this.inputContext = new InputContext(this, this.userId);
@@ -47,15 +46,25 @@ export default class TextWindowManager implements Unloadable {
         this.addins.forEach((addin) => {
             const tmp = addin.onSetWindow(window);
             if (tmp !== null) {
-                console.log("This shit didn't prevent it");
                 window = tmp;
             }
         });
+
+        if (this.window) {
+            this.window.unload();
+            this.window.windowManager = null;
+            this.window.bot = null;
+        }
 
         this.window = window;
         this.window.windowManager = this;
         this.window.bot = this.bot;
         this.window.onLoad();
+    }
+
+    newWindow(window: TextWindow) {
+        this.setWindow(window);
+        this.window.render();
     }
 
     onInput(input: Input) {
@@ -95,6 +104,9 @@ export default class TextWindowManager implements Unloadable {
         });
 
         if (unload) {
+            this.addins.forEach((addin) => {
+                addin.unload();
+            });
             this.window.unload();
             this.inputContext.unload();
             this.reactionMessage.remove();

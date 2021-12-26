@@ -1,6 +1,5 @@
 export function createRandomLightColor() {
-    let code = Math.floor(Math.random() * 16);
-    code |= Math.floor(Math.random() * 16) << 16;
-    code |= Math.floor(Math.random() * 16) << 32;
-    return code;
+    return Math.floor(Math.random() * 150 + 100) |
+            Math.floor(Math.random() * 150 + 100) << 8 |
+            Math.floor(Math.random() * 150 + 100) << 16;
 }

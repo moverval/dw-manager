@@ -5,12 +5,11 @@ import Command, { ReturnValue } from "../abstract/Command";
 import { DocumentationLinker } from "../loaders/JsonLinker";
 
 export default class CommandHandler {
-    private static makeMessageListener(prefix: string, commands: CommandMap) {
-        CommandHandler.makeMessageListener.prototype = {};
-        CommandHandler.makeMessageListener.prototype.cmdNf = new MessageEmbed()
+    static cmdNf = new MessageEmbed()
             .setTitle("Befehl existiert nicht")
             .setDescription("Nutze `++help` um alle verfügbaren Befehle einzusehen.");
 
+    private static makeMessageListener(prefix: string, commands: CommandMap) {
         return (message: Message<boolean>) => {
             if (message.channel.type === "DM") {
                 return;
@@ -41,12 +40,12 @@ export default class CommandHandler {
 
                         case ReturnValue.INVALID_COMMAND:
                             {
-                                message.channel.send(CommandHandler.makeMessageListener.prototype.cmdNf);
+                                message.channel.send({ embeds: [CommandHandler.cmdNf] });
                             }
                             break;
                     }
                 } else {
-                    message.channel.send(CommandHandler.makeMessageListener.prototype.cmdNf);
+                    message.channel.send({ embeds: [CommandHandler.cmdNf] });
                 }
             }
         };

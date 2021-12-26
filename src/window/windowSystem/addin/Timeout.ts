@@ -22,13 +22,20 @@ export default class Timeout extends TextAddin {
         this.hook = setTimeout(this.unloadManager.bind(this), this.seconds * 1000);
         return null;
     }
+
     onRender(embedCreator: EmbedCreator): EmbedCreator {
         return null;
     }
+
     onSetWindow(window: TextWindow): TextWindow {
         return null;
     }
+
     onUnload(): boolean {
         return null;
+    }
+
+    unload(): void {
+        clearTimeout(this.hook);
     }
 }
